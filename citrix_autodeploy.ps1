@@ -125,6 +125,7 @@ foreach ($AutodeployMonitor in $Config.AutodeployMonitors.AutodeployMonitor) {
                 }
             }
 
+            # Start Citrix Logger
             $CtxHighLevelLoggerParams = @{
                 AdminAddress = $AdminAddress
                 Source       = 'Citrix Autodeploy'
@@ -200,8 +201,10 @@ foreach ($AutodeployMonitor in $Config.AutodeployMonitors.AutodeployMonitor) {
                 Write-ErrorLog -Message 'Job failed'
             }
 
+            # Stop Citrix Logger
             if ($Logging) {
                 Stop-CtxHighLevelLogger -AdminAddress $AdminAddress -Logging $Logging -IsSuccessful $JobSuccessful
+                Remove-Variable -Name Logging
             }
 
             $MachinesToAdd--
