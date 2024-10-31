@@ -114,14 +114,14 @@ foreach ($AutodeployMonitor in $Config.AutodeployMonitors.AutodeployMonitor) {
             if ($AutodeployMonitor.MaxMachinesInBrokerCatalog) {
                 if (Test-MachineCountLimit -AdminAddress $AdminAddress -InputObject $BrokerCatalog -MaxMachines $AutodeployMonitor.MaxMachinesInBrokerCatalog -MaxRecordCount $MaxRecordCount) {
                     Write-WarningLog -Message "Max machine count {MaxMachinesInBrokerCatalog} reached for catalog {BrokerCatalog}" -PropertyValues $AutodeployMonitor.MaxMachinesInBrokerCatalog, $BrokerCatalog.Name
-                    continue
+                    break
                 }
             }
 
             if ($AutodeployMonitor.MaxMachinesInDesktopGroup) {
                 if (Test-MachineCountLimit -AdminAddress $AdminAddress -InputObject $DesktopGroup -MaxMachines $AutodeployMonitor.MaxMachinesInDesktopGroup -MaxRecordCount $MaxRecordCount) {
                     Write-WarningLog -Message "Max machine count {MaxMachinesInDesktopGroup} reached for desktop group {DesktopGroup}" -PropertyValues $AutodeployMonitor.MaxMachinesInDesktopGroup, $DesktopGroup.Name
-                    continue
+                    break
                 }
             }
 
