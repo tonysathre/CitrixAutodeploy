@@ -68,7 +68,7 @@ function New-CtxAutodeployVM {
 
             Write-InfoLog -Message "Removing AD account {NewAdAccount.SuccessfulAccounts.ADAccountName} from identity pool {IdentityPool}" -PropertyValues $NewAdAccount.SuccessfulAccounts.ADAccountName, $IdentityPool.IdentityPoolName
             $NewAdAccount.SuccessfulAccounts | Remove-AcctADAccount -AdminAddress $AdminAddress -IdentityPoolName $IdentityPool.IdentityPoolName
-            Stop-LogHighLevelOperation -AdminAddress $AdminAddress -HighLevelOperationId $Logging.Id -EndTime ([datetime]::Now) -IsSuccessful $false
+
             throw
         }
 
@@ -80,14 +80,11 @@ function New-CtxAutodeployVM {
         Write-InfoLog -Message "Adding machine {MachineName} in catalog {BrokerCatalog} to desktop group {DesktopGroup}" -PropertyValues $NewBrokerMachine.MachineName, $BrokerCatalog.Name, $DesktopGroup.Name
         Add-BrokerMachine -AdminAddress $AdminAddress -MachineName $NewBrokerMachine.MachineName -DesktopGroup $DesktopGroup.Name -LoggingId $Logging.Id
 
-        $IsSuccessful = $true
-
         Write-InfoLog -Message "Machine {MachineName} created successfully" -PropertyValues $MachineName
 
         return $NewBrokerMachine
     }
     catch {
-        $IsSuccessful = $false
         Write-ErrorLog -Message "Failed to create machine in catalog {BrokerCatalog}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $BrokerCatalog.Name
     }
 }
