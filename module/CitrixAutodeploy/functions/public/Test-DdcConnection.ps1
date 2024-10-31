@@ -25,7 +25,7 @@ function Test-DdcConnection {
         return Invoke-RestMethod -Uri $Uri -Method Get -UseBasicParsing
     }
     catch {
-        Write-DebugLog -Message 'Connection to delivery controller {Protocol}://{AdminAddress}/{Endpoint} failed' -PropertyValues $Protocol, $AdminAddress, $Endpoint
+        Write-WarningLog -Message 'Connection to delivery controller {Protocol}://{AdminAddress}/{Endpoint} failed' -PropertyValues $Protocol, $AdminAddress, $Endpoint
         return $false
     }
 }
