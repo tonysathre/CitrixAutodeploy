@@ -30,22 +30,22 @@ CompanyName = 'Tony Sathre'
 Copyright = '(c) 2024 Tony Sathre. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'This module is used to automate the continuous deployment of Citrix virtual desktops in a Citrix Virtual Apps & Desktops environment.'
+Description = 'This module is used to automate the deployment of Citrix virtual desktops in a Citrix Virtual Apps & Desktops environment.'
 
-# Minimum version of the PowerShell engine required by this module
+# Minimum version of the Windows PowerShell engine required by this module
 # PowerShellVersion = ''
 
-# Name of the PowerShell host required by this module
+# Name of the Windows PowerShell host required by this module
 # PowerShellHostName = ''
 
-# Minimum version of the PowerShell host required by this module
+# Minimum version of the Windows PowerShell host required by this module
 # PowerShellHostVersion = ''
 
 # Minimum version of Microsoft .NET Framework required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
 # DotNetFrameworkVersion = ''
 
 # Minimum version of the common language runtime (CLR) required by this module. This prerequisite is valid for the PowerShell Desktop edition only.
-# ClrVersion = ''
+# CLRVersion = ''
 
 # Processor architecture (None, X86, Amd64) required by this module
 # ProcessorArchitecture = ''
@@ -66,24 +66,24 @@ ScriptsToProcess = '.\functions\private\Initialize-InternalLogger.ps1'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('.\functions\private\Initialize-InternalLogger.ps1',
-               '.\functions\public\Get-CtxAutodeployConfig.ps1',
-               '.\functions\public\Initialize-CtxAutodeployEnv.ps1',
-               '.\functions\public\Initialize-CtxAutodeployLogger.ps1',
-               '.\functions\public\Invoke-CtxAutodeployTask.ps1',
-               '.\functions\public\New-CtxAutodeployVM.ps1',
-               '.\functions\public\Start-CtxHighLevelLogger.ps1',
-               '.\functions\public\Stop-CtxHighLevelLogger.ps1',
-               '.\functions\public\Test-DdcConnection.ps1',
-               '.\functions\public\Test-MachineCountLimit.ps1',
+NestedModules = @('.\functions\private\Initialize-InternalLogger.ps1', 
+               '.\functions\public\Get-CtxAutodeployConfig.ps1', 
+               '.\functions\public\Initialize-CtxAutodeployEnv.ps1', 
+               '.\functions\public\Initialize-CtxAutodeployLogger.ps1', 
+               '.\functions\public\Invoke-CtxAutodeployTask.ps1', 
+               '.\functions\public\New-CtxAutodeployVM.ps1', 
+               '.\functions\public\Start-CtxHighLevelLogger.ps1', 
+               '.\functions\public\Stop-CtxHighLevelLogger.ps1', 
+               '.\functions\public\Test-DdcConnection.ps1', 
+               '.\functions\public\Test-MachineCountExceedsLimit.ps1', 
                '.\functions\public\Wait-ForIdentityPoolUnlock.ps1')
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = 'Get-CtxAutodeployConfig', 'Initialize-CtxAutodeployEnv',
-               'Initialize-CtxAutodeployLogger', 'Invoke-CtxAutodeployTask',
-               'New-CtxAutodeployVM', 'Start-CtxHighLevelLogger',
-               'Stop-CtxHighLevelLogger', 'Test-DdcConnection',
-               'Test-MachineCountLimit', 'Wait-ForIdentityPoolUnlock'
+FunctionsToExport = 'Get-CtxAutodeployConfig', 'Initialize-CtxAutodeployEnv', 
+               'Initialize-CtxAutodeployLogger', 'Invoke-CtxAutodeployTask', 
+               'New-CtxAutodeployVM', 'Start-CtxHighLevelLogger', 
+               'Stop-CtxHighLevelLogger', 'Test-DdcConnection', 
+               'Test-MachineCountExceedsLimit', 'Wait-ForIdentityPoolUnlock'
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()
@@ -105,36 +105,32 @@ AliasesToExport = @()
 
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
+PSData = @{
 
-    PSData = @{
+                # Tags applied to this module. These help with module discovery in online galleries.
+                # Tags = @()
 
-        # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+                # A URL to the license for this module.
+                # LicenseUri = ''
 
-        # A URL to the license for this module.
-        # LicenseUri = ''
+                # A URL to the main website for this project.
+                ProjectUri = 'https://github.com/tonysathre/CitrixAutodeploy'
 
-        # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/tonysathre/CitrixAutodeploy'
+                # A URL to an icon representing this module.
+                # IconUri = ''
 
-        # A URL to an icon representing this module.
-        # IconUri = ''
+                # ReleaseNotes of this module
+                # ReleaseNotes = ''
 
-        # ReleaseNotes of this module
-        # ReleaseNotes = ''
+                # Prerelease string of this module
+                # Prerelease = ''
 
-        # Prerelease string of this module
-        # Prerelease = ''
+                # Flag to indicate whether the module requires explicit user acceptance for install/update/save
+                # RequireLicenseAcceptance = $false
 
-        # Flag to indicate whether the module requires explicit user acceptance for install/update/save
-        # RequireLicenseAcceptance = $false
-
-        # External dependent modules of this module
-        # ExternalModuleDependencies = @()
-
-    } # End of PSData hashtable
-
-
+                # External dependent modules of this module
+                # ExternalModuleDependencies = @()
+} # End of PSData hashtable
 } # End of PrivateData hashtable
 
 # HelpInfo URI of this module
