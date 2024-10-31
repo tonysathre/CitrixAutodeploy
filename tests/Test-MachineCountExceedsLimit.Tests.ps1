@@ -1,16 +1,23 @@
-Describe 'Test-MachineCountLimit' {
+Describe 'Test-MachineCountExceedsLimit' {
     BeforeDiscovery {
-        $MockDesktopGroup = New-MockObject -Type 'Citrix.Broker.Admin.SDK.DesktopGroup' -Properties @{
+        @(
+            "Citrix.ADIdentity.Commands",
+            "Citrix.Broker.Commands",
+            "Citrix.ConfigurationLogging.Commands",
+            "Citrix.MachineCreation.Commands"
+        ) | Import-Module -Force -ErrorAction Stop 3> $null
+
+        $MockDesktopGroup = New-MockObject -Type ([Citrix.Broker.Admin.SDK.DesktopGroup]) -Properties @{
             Name = 'MockDesktopGroup'
         }
 
-        $MockCatalog = New-MockObject -Type 'Citrix.Broker.Admin.SDK.Catalog' -Properties @{
+        $MockCatalog = New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
             Name = 'MockCatalog'
         }
     }
 
     BeforeAll {
-        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Test-MachineCountLimit.ps1"
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Test-MachineCountExceedsLimit.ps1"
     }
 
     BeforeEach {
@@ -22,7 +29,7 @@ Describe 'Test-MachineCountLimit' {
 
         Mock Get-BrokerMachine {
         return @(1..5 | ForEach-Object {
-                            New-MockObject -Type 'Citrix.Broker.Admin.SDK.Machine' -Properties @{
+                            New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{
                             Name = "Machine$_"
                         }
                     }
@@ -35,12 +42,12 @@ Describe 'Test-MachineCountLimit' {
     Context 'When InputObject is type <_.GetType().FullName>' -ForEach $Types {
 
         It 'Should return $true if machine count exceeds MaxMachines' {
-            $Result = Test-MachineCountLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 3
+            $Result = Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 3
             $Result | Should -Be $true
         }
 
         It 'Should return $false if machine count is less than MaxMachines' {
-            $Result = Test-MachineCountLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 10
+            $Result = Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 10
             $Result | Should -Be $false
         }
     }
@@ -51,7 +58,11 @@ Describe 'Test-MachineCountLimit' {
                 throw 'Mocked exception'
             }
 
-            { Test-MachineCountLimit -AdminAddress 'TestAdminAddress' -InputObject $MockCatalog -MaxMachines 3 } | Should -Throw
+            { Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $MockCatalog -MaxMachines 3 } | Should -Throw
+        }
+
+        It 'Should throw an error if InputObject is not a valid type' {
+            { Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject 'InvalidType' -MaxMachines 3 } | Should -Throw
         }
     }
 }
