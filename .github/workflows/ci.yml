@@ -1,0 +1,18 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+      runs-on: windows-latest
+      strategy:
+        matrix:
+          pwsh-version: ['7.3.12', '7.2.23']
+      steps:
+        - uses: actions/checkout@v2
+        - name: Setup PowerShell
+          uses: microsoft/setup-powershell@v1
+          with:
+            pwsh-version: '7.3.12'
+
