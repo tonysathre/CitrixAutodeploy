@@ -40,5 +40,5 @@ function Invoke-MsiExec {
 }
 
 Get-ChildItem "${PSScriptRoot}\modules\*.msi" | ForEach-Object {
-    Invoke-MsiExec -Action Install -FilePath $_.FullName -Arguments $InstallArgs
+    Invoke-MsiExec -Action Install -FilePath $_.FullName
 }
