@@ -14,6 +14,7 @@ jobs:
         shell: powershell
 
       - run: Get-Module -ListAvailable Citrix.*
+        shell: powershell
 #  build-module:
 #      runs-on: windows-latest
 #      strategy:
