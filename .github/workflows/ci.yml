@@ -8,6 +8,7 @@ jobs:
   install-prereqs:
     runs-on: windows-latest
     steps:
+      - uses: actions/checkout@v4
       - run: ${{ github.workspace }}/.github/workflows/prereqs/install-prereqs.ps1
 
 #  build-module:
