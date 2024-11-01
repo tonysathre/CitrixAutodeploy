@@ -34,7 +34,7 @@ function Invoke-MsiExec {
         Passthru         = $true
     }
 
-    '{0}ing {1}...' -f $Action, $FilePath
+    '{0}ing {1} ...' -f $Action, $FilePath
     $Process = Start-Process @StartProcessArgs
 
     Write-Verbose ("Command line: `n{0} {1}" -f $Process.StartInfo.FileName, $Process.StartInfo.Arguments)
