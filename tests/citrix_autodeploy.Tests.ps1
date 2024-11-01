@@ -1,17 +1,22 @@
 Describe 'Main Script Execution' {
     BeforeEach {
         Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -Scope Local -WarningAction SilentlyContinue
+        Mock Write-InfoLog    {}
+        Mock Write-DebugLog   {}
+        Mock Write-ErrorLog   {}
+        Mock Write-WarningLog {}
+        Mock Write-VerboseLog {}
     }
 
     It 'Should initialize the environment' {
         Mock Get-BrokerDesktopGroup { return [PSCustomObject]@{ Name = 'TestGroup' } }
         Mock Get-BrokerCatalog { return [PSCustomObject]@{ Uid = 'TestUid'; Name = 'TestCatalog' } }
         Mock Get-BrokerMachine { return @([PSCustomObject]@{ IsAssigned = $false }) }
-        Mock Initialize-Environment
+        Mock Initialize-CtxAutodeployEnv
         Mock New-CtxAutodeployVM    { return [PSCustomObject]@{ MachineName = 'TestMachine' } }
         { . "${PSScriptRoot}/../citrix_autodeploy.ps1" } | Should -Not -Throw
 
-        Should -Invoke Initialize-Environment -Exactly 1 -Scope It
+        Should -Invoke Initialize-CtxAutodeployEnv -Exactly 1 -Scope It
     }
 
     It 'Should execute main script logic' {

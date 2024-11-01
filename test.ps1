@@ -2,19 +2,30 @@
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $false)]
-    [string]$Path = "${PSScriptRoot}\tests",
+[   Parameter()]
+    [System.IO.FileInfo[]]$Path = "${PSScriptRoot}\tests",
 
     [Parameter(Mandatory = $false)]
     [ValidateSet('Diagnostic', 'Detailed', 'Normal', 'Minimal', 'None')]
-    [string]$Output = 'Normal'
+    [string]$Output = 'Detailed',
+
+    [Parameter()]
+    [ValidateSet('None', 'FirstLine', 'Filtered','Full')]
+    $StackTraceVerbosity = 'Filtered',
+
+    [Parameter()]
+    [bool]$CodeCoverageEnabled = $false
 )
 
 Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
 
 $PesterConfiguration = New-PesterConfiguration
-$PesterConfiguration.Output.Verbosity = $Output
-$PesterConfiguration.Run.Path = $Path
-$PesterConfiguration.CodeCoverage.Enabled = $true
+$PesterConfiguration.Output.Verbosity                      = $Output
+$PesterConfiguration.Run.Path                              = $Path
+$PesterConfiguration.Output.Verbosity                      = $Output
+$PesterConfiguration.Output.StackTraceVerbosity            = $StackTraceVerbosity
+$PesterConfiguration.CodeCoverage.Enabled                  = $CodeCoverageEnabled
+$PesterConfiguration.CodeCoverage.Path                     = $Path
+$PesterConfiguration.CodeCoverage.CoveragePercentTarget    = 75
 
 Invoke-Pester -Configuration $PesterConfiguration

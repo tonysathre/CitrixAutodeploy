@@ -3,6 +3,7 @@
 [CmdletBinding()]
 param (
     [Parameter()]
+    [ValidateNotNullOrEmpty()]
     [System.IO.FileInfo]$FilePath = $env:CITRIX_AUTODEPLOY_CONFIG,
 
     [Parameter()]
@@ -12,8 +13,13 @@ param (
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [System.IO.FileInfo]$LogFile = $env:CITRIX_AUTODEPLOY_LOGFILE
+    [System.IO.FileInfo]$LogFile = $env:CITRIX_AUTODEPLOY_LOGFILE,
+
+    [Parameter()]
+    $MaxRecordCount = 10000,
+
+    [Parameter()]
+    [switch]$DryRun
 )
 
-$env:CI = $true
 .\citrix_autodeploy.ps1 @PSBoundParameters
