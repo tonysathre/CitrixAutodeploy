@@ -1,18 +1,24 @@
 name: CI
 
 on:
-  push:
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
-  build:
-      runs-on: windows-latest
-      strategy:
-        matrix:
-          pwsh-version: ['7.3.12', '7.2.23']
-      steps:
-        - uses: actions/checkout@v2
-        - name: Setup PowerShell
-          uses: microsoft/setup-powershell@v1
-          with:
-            pwsh-version: '7.3.12'
+  install-prereqs:
+    runs-on: windows-latest
+    steps:
+      - run: ${{ github.workspace }}/install-prereqs.ps1
+
+#  build-module:
+#      runs-on: windows-latest
+#      strategy:
+#        matrix:
+#          pwsh-version: ['7.3.12', '7.2.23']
+#      steps:
+#        - uses: actions/checkout@v4
+#        - name: Setup PowerShell
+#          uses: microsoft/setup-powershell@v1
+#          with:
+#            pwsh-version: '7.3.12'
 
