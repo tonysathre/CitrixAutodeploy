@@ -6,7 +6,10 @@ function Invoke-MsiExec {
         [string]$Action,
 
         [Parameter(Mandatory)]
-        [System.IO.FileInfo]$FilePath
+        [System.IO.FileInfo]$FilePath,
+
+        [Parameter()]
+        [System.Collections.Generic.List[string]]$Arguments = @()
     )
 
     $TimeStamp = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'
