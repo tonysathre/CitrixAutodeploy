@@ -1,3 +1,6 @@
+[CmdletBinding()]
+param ()
+
 $Dependencies = @(
     @{
         Name            = 'Pester'
@@ -47,10 +50,10 @@ function Invoke-MsiExec {
     return "{0}`n" -f [ComponentModel.Win32Exception]$Process.ExitCode
 }
 
-Get-ChildItem "${PSScriptRoot}\modules\*.msi" | ForEach-Object {
+Get-ChildItem "${PSScriptRoot}\prereqs\modules\*.msi" | ForEach-Object {
     Invoke-MsiExec -Action Install -FilePath $_.FullName
 }
 
 $Dependencies | ForEach-Object {
-    $_ | Install-Module -AllowClobber -Verbose
+    Install-Module @_ -AllowClobber -Verbose
 }
