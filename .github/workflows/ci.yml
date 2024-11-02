@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: ${{ github.workspace }}/install-prereqs.ps1
+      - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose
         shell: powershell
 
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
