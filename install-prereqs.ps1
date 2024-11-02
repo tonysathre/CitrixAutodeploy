@@ -55,5 +55,5 @@ Get-ChildItem "${PSScriptRoot}\prereqs\modules\*.msi" | ForEach-Object {
 }
 
 $Dependencies | ForEach-Object {
-    Install-Module @_ -AllowClobber -Verbose
+    Install-Module @_ -AllowClobber -Confirm:$false
 }
