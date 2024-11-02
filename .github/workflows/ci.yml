@@ -16,7 +16,10 @@ jobs:
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
         shell: powershell
 
-      - run: Get-Module -ListAvailable Citrix*
+      - run: Import-Module ${{github.workspace}}/module/CitrixAutodeploy/CitrixAutodeploy.psd1
+        shell: powershell
+
+      - run: Initialize-CitrixAutodeployEnv
         shell: powershell
 #  build-module:
 #      runs-on: windows-latest
