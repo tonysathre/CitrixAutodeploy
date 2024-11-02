@@ -15,6 +15,9 @@ jobs:
 
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
         shell: powershell
+
+      - run: Get-Module -ListAvailable Citrix*
+        shell: powershell
 #  build-module:
 #      runs-on: windows-latest
 #      strategy:
