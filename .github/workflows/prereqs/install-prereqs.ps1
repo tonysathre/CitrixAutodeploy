@@ -12,11 +12,6 @@ function Invoke-MsiExec {
         [System.Collections.Generic.List[string]]$Arguments = @()
     )
 
-    $TimeStamp = Get-Date -Format 'yyyy-MM-dd_HH-mm-ss'
-    $LogName = "{0}_{1}_{2}.log" -f $FilePath.Name, $Action, $TimeStamp
-    $Log = Join-Path $env:TEMP $LogName
-
-    Write-Verbose $Log
     if ($Action -eq 'Install') {
         $Arguments.Add('/i')
         $Arguments.Add("`"$FilePath`"")
@@ -24,7 +19,6 @@ function Invoke-MsiExec {
 
     $Arguments.Add('/qn')
     $Arguments.Add('/norestart')
-    $Arguments.Add("/log `"$Log`"")
 
     $StartProcessArgs = @{
         FilePath         = 'msiexec'
