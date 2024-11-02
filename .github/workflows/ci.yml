@@ -13,7 +13,7 @@ jobs:
       - run: ${{ github.workspace }}/.github/workflows/prereqs/install-prereqs.ps1
         shell: powershell
 
-      - run: ls -Recurse 'C:\Program Files\Citrix\PowerShellModules'
+      - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
         shell: powershell
 #  build-module:
 #      runs-on: windows-latest
