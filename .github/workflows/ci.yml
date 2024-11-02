@@ -12,7 +12,7 @@ jobs:
 
       - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose
         shell: powershell
-
+      # TODO(tonysathre): Need to test removing this step
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
         shell: powershell
 
