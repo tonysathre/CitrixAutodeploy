@@ -13,7 +13,7 @@ jobs:
       - run: ${{ github.workspace }}/.github/workflows/prereqs/install-prereqs.ps1
         shell: powershell
 
-      - run: Get-Module -ListAvailable Citrix*
+      - run: ls -Recurse C:\Program Files\Citrix\PowerShellModules
         shell: powershell
 #  build-module:
 #      runs-on: windows-latest
