@@ -1,3 +1,14 @@
+$Dependencies = @(
+    @{
+        Name            = 'Pester'
+        RequiredVersion = '5.5.0'
+    },
+    @{
+        Name            = 'PoShLog'
+        RequiredVersion = '2.1.1'
+    }
+)
+
 function Invoke-MsiExec {
     [CmdletBinding()]
     param (
@@ -38,4 +49,8 @@ function Invoke-MsiExec {
 
 Get-ChildItem "${PSScriptRoot}\modules\*.msi" | ForEach-Object {
     Invoke-MsiExec -Action Install -FilePath $_.FullName
+}
+
+$Dependencies | ForEach-Object {
+    $_ | Install-Module -AllowClobber -Verbose
 }
