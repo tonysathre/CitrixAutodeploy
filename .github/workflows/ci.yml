@@ -18,7 +18,7 @@ jobs:
 
       - run: |
           Import-Module ${{github.workspace}}/module/CitrixAutodeploy/CitrixAutodeploy.psd1
-          Initialize-CitrixAutodeployEnv
+          Initialize-CtxAutodeployEnv
         shell: powershell
 
 #  build-module:
