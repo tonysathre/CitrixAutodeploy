@@ -16,7 +16,7 @@ jobs:
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
         shell: powershell
 
-      - uses: lhotari/action-upterm@v1
+      - uses: mxschmitt/action-tmate@v3
 
       - run: |
           Import-Module ${{github.workspace}}/module/CitrixAutodeploy/CitrixAutodeploy.psd1
