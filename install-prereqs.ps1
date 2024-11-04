@@ -1,15 +1,6 @@
 [CmdletBinding()]
-param ()
-
-$Dependencies = @(
-    @{
-        Name            = 'Pester'
-        RequiredVersion = '5.5.0'
-    },
-    @{
-        Name            = 'PoShLog'
-        RequiredVersion = '2.1.1'
-    }
+param (
+    [switch]$Force
 )
 
 function Invoke-MsiExec {
@@ -54,6 +45,6 @@ Get-ChildItem "${PSScriptRoot}\prereqs\modules\*.msi" | ForEach-Object {
     Invoke-MsiExec -Action Install -FilePath $_.FullName
 }
 
-$Dependencies | ForEach-Object {
-    Install-Module @_ -AllowClobber -Confirm:$false -Force -SkipPublisherCheck
+& ${PSScriptRoot}\requirements.ps1 | ForEach-Object {
+    Install-Module @_ -AllowClobber -Confirm:$false -Force:$Force -SkipPublisherCheck
 }
