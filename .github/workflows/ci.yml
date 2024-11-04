@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose
+      - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose -Force
         shell: powershell
       # TODO(tonysathre): Need to test removing this step
       - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
