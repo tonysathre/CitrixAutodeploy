@@ -12,11 +12,9 @@ jobs:
 
       - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose -Force
         shell: powershell
-      # TODO(tonysathre): Need to test removing this step
-      - run: $env:PSModulePath = [System.Environment]::GetEnvironmentVariable("PSModulePath", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PSModulePath", "User")
-        shell: powershell
 
       - run: |
+          $env:PSModulePath += ';C:\Program Files\Citrix\PowerShellModules'
           echo $env:PSModulePath
           get-module citrix* -ListAvailable
           Import-Module ${{github.workspace}}/module/CitrixAutodeploy/CitrixAutodeploy.psd1
