@@ -46,5 +46,10 @@ Get-ChildItem "${PSScriptRoot}\prereqs\modules\*.msi" | ForEach-Object {
 }
 
 & ${PSScriptRoot}\requirements.ps1 | ForEach-Object {
-    Install-Module @_ -AllowClobber -Confirm:$false -Force:$Force -SkipPublisherCheck
+    try {
+        Install-Module @_ -AllowClobber -Confirm:$false -Force:$Force -SkipPublisherCheck
+    }
+    catch {
+        throw $_
+    }
 }

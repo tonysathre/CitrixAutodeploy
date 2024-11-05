@@ -16,4 +16,10 @@ jobs:
       - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
         shell: powershell
 
+  test:
+    runs-on: windows-latest
+    needs: install-prereqs
+    steps:
+      - uses: actions/checkoutv4
+
       - run: echo $env:PATH
