@@ -10,25 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: ${{ github.workspace }}/install-prereqs.ps1 -Verbose -Force
+      - run: ${{ github.workspace }}/install-prereqs.ps1
         shell: powershell
 
-      - run: |
-          $env:PSModulePath += ';C:\Program Files\Citrix\PowerShellModules'
-          Import-Module ${{github.workspace}}/module/CitrixAutodeploy/CitrixAutodeploy.psd1
-          Initialize-CtxAutodeployEnv -Verbose
-          Get-Command -Module CitrixAutodeploy
+      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
         shell: powershell
 
-#  build-module:
-#      runs-on: windows-latest
-#      strategy:
-#        matrix:
-#          pwsh-version: ['7.3.12', '7.2.23']
-#      steps:
-#        - uses: actions/checkout@v4
-#        - name: Setup PowerShell
-#          uses: microsoft/setup-powershell@v1
-#          with:
-#            pwsh-version: '7.3.12'
-
+      - run: echo $env:PATH
