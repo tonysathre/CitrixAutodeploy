@@ -17,15 +17,15 @@ param (
     [bool]$CodeCoverageEnabled = $false
 )
 
-Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -ErrorAction Stop -Force 3> $null
 
 $PesterConfiguration = New-PesterConfiguration
-$PesterConfiguration.Output.Verbosity                      = $Output
-$PesterConfiguration.Run.Path                              = $Path
-$PesterConfiguration.Output.Verbosity                      = $Output
-$PesterConfiguration.Output.StackTraceVerbosity            = $StackTraceVerbosity
-$PesterConfiguration.CodeCoverage.Enabled                  = $CodeCoverageEnabled
-$PesterConfiguration.CodeCoverage.Path                     = $Path
-$PesterConfiguration.CodeCoverage.CoveragePercentTarget    = 75
+$PesterConfiguration.Output.Verbosity                   = $Output
+$PesterConfiguration.Run.Path                           = $Path
+$PesterConfiguration.Output.Verbosity                   = $Output
+$PesterConfiguration.Output.StackTraceVerbosity         = $StackTraceVerbosity
+$PesterConfiguration.CodeCoverage.Enabled               = $CodeCoverageEnabled
+$PesterConfiguration.CodeCoverage.Path                  = $Path
+$PesterConfiguration.CodeCoverage.CoveragePercentTarget = 75
 
 Invoke-Pester -Configuration $PesterConfiguration

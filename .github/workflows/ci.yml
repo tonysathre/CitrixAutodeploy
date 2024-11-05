@@ -13,13 +13,16 @@ jobs:
       - run: ${{ github.workspace }}/install-prereqs.ps1
         shell: powershell
 
-      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
-        shell: powershell
-
   test:
     runs-on: windows-latest
     needs: install-prereqs
     steps:
       - uses: actions/checkout@v4
 
+      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
+        shell: powershell
+
       - run: echo $env:PATH
+        shell: powershell
+
+      - run: .\test
