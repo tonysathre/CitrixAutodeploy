@@ -5,24 +5,15 @@ on:
     types: [opened, synchronize]
 
 jobs:
-  install-prereqs:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - run: ${{ github.workspace }}/install-prereqs.ps1
-        shell: powershell
-
   test:
     runs-on: windows-latest
-    needs: install-prereqs
     steps:
       - uses: actions/checkout@v4
 
-      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
+      - run: ${{ github.workspace }}/install-prereqs.ps1 -Force
         shell: powershell
 
-      - run: echo $env:PATH
+      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
         shell: powershell
 
       - run: .\test
