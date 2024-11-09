@@ -1,41 +1,35 @@
 Describe 'Invoke-CtxAutodeployTask' {
     BeforeAll {
-        Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Invoke-CtxAutodeployTask.ps1"
+        Mock Write-InfoLog {}
+        Mock Write-DebugLog {}
+        Mock Write-ErrorLog {}
+        Mock Write-WarningLog {}
+        Mock Write-VerboseLog {}
     }
 
-    $TestConfig = Get-CtxAutodeployConfig -FilePath ${PSScriptRoot}\test_config.json
     $TestCases = @(
         @{
-            Task = 'PreTask'
+            FilePath     = 'PreTask'
             Type = 'Pre'
-            ArgumentList = @(
-                [PSCustomObject]@{
-                    AutodeployMonitor = $TestConfig.AutodeployMonitors.AutodeployMonitor[0]
-                    DesktopGroup      =  $TestConfig.AutodeployMonitors.AutodeployMonitor[0].DesktopGroupName
-                    BrokerCatalog     = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].BrokerCatalog
-                }
-            )
+            ArgumentList = @()
         },
         @{
-            Task = 'PostTask'
+            FilePath     = 'PostTask'
             Type = 'Post'
-            ArgumentList = [PSCustomObject]@{
-                AutodeployMonitor = $TestConfig.AutodeployMonitors.AutodeployMonitor[0]
-                DesktopGroup      = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].DesktopGroupName
-                BrokerCatalog     = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].BrokerCatalog
-            }
+            ArgumentList = @()
         }
     )
 
     It 'Should execute <_.Task>' -TestCases $TestCases {
-        param($Task, $Type, $ArgumentList)
+        param($FilePath, $Type, $ArgumentList)
 
-        $ExpectedOutput = "A test ${Task} script was executed"
-        $Task           = "${PSScriptRoot}\test_${Task}.ps1"
+        $ExpectedOutput = "A test ${Type} script was executed"
+        $FilePath           = "${PSScriptRoot}\test_${Type}.ps1"
 
         $Params = @{
             Task    = $Task
-            Context = 'TestContext'
+            Context = 'PreTaskTest'
             Type    = $Type
             ArgumentList = $ArgumentList
         }

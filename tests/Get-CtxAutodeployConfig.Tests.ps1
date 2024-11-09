@@ -1,6 +1,12 @@
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
-        Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        #Import-Module ${PSScriptRoot}\Pester.Helper.psm1
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployEnv.ps1"
+        Mock Write-InfoLog {}
+        Mock Write-DebugLog {}
+        Mock Write-ErrorLog {}
+        Mock Write-WarningLog {}
+        Mock Write-VerboseLog {}
     }
 
     Context 'When the configuration file exists' {

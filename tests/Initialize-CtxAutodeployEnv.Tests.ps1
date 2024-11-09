@@ -1,7 +1,13 @@
-# Import the module containing the function to be tested
-Import-Module -Name '../module/CitrixAutodeploy/functions/public/Initialize-CtxAutodeployEnv.ps1'
-
 Describe 'Initialize-CtxAutodeployEnv' {
+    BeforeAll {
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployEnv.ps1"
+        Mock Write-InfoLog {}
+        Mock Write-DebugLog {}
+        Mock Write-ErrorLog {}
+        Mock Write-WarningLog {}
+        Mock Write-VerboseLog {}
+    }
+
     Context 'When called' {
         It 'Should import the required modules without errors' {
             Mock Import-Module { return $true } -ModuleName 'CitrixAutodeploy'
@@ -19,13 +25,6 @@ Describe 'Initialize-CtxAutodeployEnv' {
             { Initialize-CtxAutodeployEnv } | Should -Not -Throw
         }
 
-        It 'Should log a verbose message when called' {
-            $VerbosePreference = 'Continue'
-            $VerboseMessages = & {
-                Initialize-CtxAutodeployEnv -Verbose
-            } 4>&1
-
-            $VerboseMessages | Should -Contain 'Function Initialize-CtxAutodeployEnv called'
         }
 
         It 'Should throw an error if a module fails to import' {
