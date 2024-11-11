@@ -1,11 +1,3 @@
-function Mock-LoggingFunctions {
-    Mock Write-InfoLog    {}
-    Mock Write-DebugLog   {}
-    Mock Write-ErrorLog   {}
-    Mock Write-WarningLog {}
-    Mock Write-VerboseLog {}
-}
-
 function Import-CitrixAutodeployModule {
     Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
 }
@@ -100,12 +92,16 @@ function Get-MockProvTask {
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Finished', 'Running')]
-        [string]$Status
+        [string]$Status,
+
+        [Parameter(Mandatory)]
+        [string]$TerminatingError = $null
     )
 
     return @{
-        TaskId = [guid]::NewGuid()
-        Status  = $Status
+        TaskId           = [guid]::NewGuid()
+        Status           = $Status
+        TerminatingError = $TerminatingError
     }
 }
 
