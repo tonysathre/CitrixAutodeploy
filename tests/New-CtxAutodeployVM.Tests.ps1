@@ -1,13 +1,15 @@
-BeforeDiscovery {
-            if ($PSBoundParameters.ContainsKey['Debug']) {
-            Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy
-            Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
-        }
-}
+
 Describe 'New-CtxAutodeployVM' {
     BeforeAll {
-        #. "${PSScriptRoot}/../module/CitrixAutodeploy/functions/public/New-CtxAutodeployVM.ps1"
-        Import-Module -Name "${PSScriptRoot}/Pester.Helper.psm1"
+        Import-Module "${PSScriptRoot}/Pester.Helper.psm1" 3> $null
+        @(
+            "Citrix.ADIdentity.Commands",
+            "Citrix.Broker.Commands",
+            "Citrix.ConfigurationLogging.Commands",
+            "Citrix.MachineCreation.Commands",
+            "${PSScriptRoot}\..\module\CitrixAutodeploy"
+        ) | Import-Module -Force -ErrorAction Stop 3> $null
+        Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichmentWithExceptionDetails
     }
 
     BeforeEach {
@@ -18,8 +20,13 @@ Describe 'New-CtxAutodeployVM' {
     }
 
     AfterAll {
-        Remove-Module -Name CitrixAutodeploy
-        Close-Logger
+        @(
+            "Citrix.ADIdentity.Commands",
+            "Citrix.Broker.Commands",
+            "Citrix.ConfigurationLogging.Commands",
+            "Citrix.MachineCreation.Commands",
+            "${PSScriptRoot}\..\module\CitrixAutodeploy"
+        ) | Remove-Module -Force
     }
 
     Context 'When creating a new VM' {
