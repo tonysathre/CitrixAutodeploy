@@ -22,7 +22,6 @@ Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -ErrorAction Stop -Force 3
 $PesterConfiguration = New-PesterConfiguration
 $PesterConfiguration.Output.Verbosity                   = $Output
 $PesterConfiguration.Run.Path                           = $Path
-$PesterConfiguration.Output.Verbosity                   = $Output
 $PesterConfiguration.Output.StackTraceVerbosity         = $StackTraceVerbosity
 $PesterConfiguration.CodeCoverage.Enabled               = $CodeCoverageEnabled
 $PesterConfiguration.CodeCoverage.Path                  = $Path
