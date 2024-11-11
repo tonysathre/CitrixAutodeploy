@@ -11,7 +11,10 @@ function Initialize-CtxAutodeployLogger {
         [System.IO.FileInfo]$LogFile = $env:CITRIX_AUTODEPLOY_LOGFILE,
 
         [Parameter()]
-        [string]$LogOutputTemplate = '[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}'
+        [string]$LogOutputTemplate = '[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}',
+
+        [Parameter()]
+        [switch]$AddEnrichWithExceptionDetails
     )
 
     Write-VerboseLog -Message "Function {MyCommand} called with parameters: {PSBoundParameters}" -PropertyValues $MyInvocation.MyCommand, ($PSBoundParameters | Out-String)
@@ -22,6 +25,11 @@ function Initialize-CtxAutodeployLogger {
     if ($LogFile) {
         Write-VerboseLog -Message "Adding file sink {LogFile} to logger" -PropertyValues $LogFile
         $LoggerConfig = $LoggerConfig | Add-SinkFile -Path $LogFile -OutputTemplate $LogOutputTemplate
+    }
+
+    if ($AddEnrichWithExceptionDetails) {
+        Write-VerboseLog -Message 'Adding enrich with exception details to logger'
+        $LoggerConfig = $LoggerConfig | Add-EnrichWithExceptionDetails
     }
 
     Write-DebugLog -Message 'Starting logger'
