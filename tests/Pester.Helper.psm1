@@ -2,6 +2,9 @@ function Import-CitrixAutodeployModule {
     Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
 }
 
+function New-MockAdminAddress {
+    return 'test-admin-address'
+}
 function New-MockBrokerCatalog {
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
         Name        = 'MockBrokerCatalog'
@@ -19,9 +22,11 @@ function New-MockDesktopGroup {
 }
 
 function New-MockBrokerMachine {
+    $ADAccount = New-MockADComputer
+
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{
-        MachineName       = 'DOMAIN\MockMachine'
-        HostedMachineName = 'MockMachine'
+        MachineName       = $ADAccount.Name
+        HostedMachineName = $ADAccount.Name
         Uid               = [guid]::NewGuid()
     }
 }
@@ -32,7 +37,7 @@ function New-MockCtxHighLevelLogger {
     }
 }
 
-function Get-RandomComputerName {
+function New-RandomComputerName {
     param (
         [Parameter()]
         [int]$Length = 8
@@ -51,7 +56,7 @@ function New-MockADComputer {
     $SidBytes[1] = 0  # Set the number of sub-authorities to 0
     $Sid = New-Object System.Security.Principal.SecurityIdentifier($SidBytes, 0)
 
-    $Name = Get-RandomComputerName
+    $Name = 'PESTER-123456'
 
     return @{
         Name           = $Name
@@ -88,21 +93,29 @@ function Get-MockProvVM {
 
 }
 
-function Get-MockProvTask {
+function New-MockProvTask {
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Finished', 'Running')]
         [string]$Status,
 
-        [Parameter(Mandatory)]
-        [string]$TerminatingError = $null
+        [Parameter()]
+        [string]$TerminatingError = $null,
+
+        [Parameter()]
+        [bool]$Active = $false
     )
 
     return @{
+        Active           = $Active
         TaskId           = [guid]::NewGuid()
         Status           = $Status
         TerminatingError = $TerminatingError
     }
+}
+
+function Get-MockProvTask {
+    return [guid]::NewGuid()
 }
 
 function Unlock-MockProvVM {
@@ -135,22 +148,32 @@ function New-MockAcctADAccount {
         [string]$Lock = $false
     )
 
+    $Domain = 'PESTER'
     $ADAccount = New-MockADComputer
 
-    return New-MockObject -Type ([Citrix.ADIdentity.Sdk.IdentityInPool]) -Properties @{
-        AccountName      = $ADAccount.SamAccountName
-        IdentityPoolName = 'MockIdentityPool'
-        ADAccountSid     = $ADAccount.SID
-        Lock             = $Lock
+    return New-MockObject -Type ([Citrix.ADIdentity.Sdk.AccountOperationDetailedSummary]) -Properties @{
+        SuccessfulAccounts = @(
+            @{
+                ADAccountName    = "{0}\{1}" -f $Domain, $ADAccount.SamAccountName
+                Domain           = $Domain
+                IdentityPoolName = (Get-MockAcctIdentityPool).IdentityPoolName
+                ADAccountSid     = $ADAccount.SID
+                Lock             = $Lock
+            }
+        )
     }
 }
 
 function New-MockProvScheme {
-    return New-MockObject -Type ([Citrix.MachineCreation.Sdk.ProvisioningScheme]) @{
+    return New-MockObject -Type ([Citrix.MachineCreation.Sdk.ProvisioningScheme]) -Properties @{
         ProvisioningSchemeName = 'MockProvScheme'
     }
 }
 
+function Get-MockProvScheme {
+    return New-MockProvScheme
+}
+
 function Add-MockBrokerMachine {
-    Mock Add-BrokerMachine {}
+    return $null
 }
