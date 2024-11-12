@@ -41,14 +41,14 @@ Describe 'New-CtxAutodeployVM' {
     }
 
     AfterAll {
-        @(
-            'Citrix.ADIdentity.Commands',
-            'Citrix.Broker.Commands',
-            'Citrix.ConfigurationLogging.Commands',
-            'Citrix.MachineCreation.Commands',
-            "${PSScriptRoot}\..\module\CitrixAutodeploy",
-            "${PSScriptRoot}\Pester.Helper.psm1"
-        ) | Remove-Module -Force
+        #@(
+        #    'Citrix.ADIdentity.Commands',
+        #    'Citrix.Broker.Commands',
+        #    'Citrix.ConfigurationLogging.Commands',
+        #    'Citrix.MachineCreation.Commands',
+        #    "${PSScriptRoot}\..\module\CitrixAutodeploy",
+        #    "${PSScriptRoot}\Pester.Helper.psm1"
+        #) | Remove-Module -Force
 
         if ($VerbosePreference -eq 'Continue') {
             $global:VerbosePreference = 'SilentlyContinue'
