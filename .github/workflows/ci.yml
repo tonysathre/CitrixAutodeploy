@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - run: ${{ github.workspace }}/install-prereqs.ps1 -Force
+      - run: .\install-prereqs.ps1 -Force
         shell: powershell
 
       - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
