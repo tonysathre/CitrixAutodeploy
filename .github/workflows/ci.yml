@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize]
 
+  push:
+
 jobs:
   test:
     runs-on: windows-latest
