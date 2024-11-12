@@ -68,7 +68,7 @@ function New-MockADComputer {
 function New-MockProvVM {
     param (
         [Parameter()]
-        [string]$Lock = $false
+        [bool]$Lock = $false
     )
 
     $ADAccount = New-MockADComputer
@@ -86,11 +86,10 @@ function New-MockProvVM {
 function Get-MockProvVM {
     param (
         [Parameter()]
-        [string]$Lock = $false
+        [bool]$Lock = $false
     )
 
     return New-MockProvVM @PSBoundParameters
-
 }
 
 function New-MockProvTask {
@@ -133,7 +132,7 @@ function Remove-MockAcctADAccount {
 function Get-MockAcctIdentityPool {
     param (
         [Parameter()]
-        [string]$Lock = $false
+        [bool]$Lock = $false
     )
 
     return [PSCustomObject]@{
@@ -145,7 +144,7 @@ function Get-MockAcctIdentityPool {
 function New-MockAcctADAccount {
     param (
         [Parameter()]
-        [string]$Lock = $false
+        [bool]$Lock = $false
     )
 
     $Domain = 'PESTER'
