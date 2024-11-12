@@ -16,3 +16,4 @@ jobs:
         shell: powershell
 
       - run: .\test
+        shell: powershell
