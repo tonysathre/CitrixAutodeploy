@@ -1,12 +1,12 @@
+#Requires -Modules @{ModuleName = 'Pester'; ModuleVersion = '5.6.1'}
+
+[CmdletBinding()]
+param ()
+
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
-        #Import-Module ${PSScriptRoot}\Pester.Helper.psm1
-        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployEnv.ps1"
-        Mock Write-InfoLog {}
-        Mock Write-DebugLog {}
-        Mock Write-ErrorLog {}
-        Mock Write-WarningLog {}
-        Mock Write-VerboseLog {}
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Get-CtxAutodeployConfig.ps1"
     }
 
     Context 'When the configuration file exists' {
