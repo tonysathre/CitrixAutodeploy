@@ -5,7 +5,7 @@ param (
 [   Parameter()]
     [System.IO.FileInfo[]]$Path = "${PSScriptRoot}\tests",
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [ValidateSet('Diagnostic', 'Detailed', 'Normal', 'Minimal', 'None')]
     [string]$Output = 'Detailed',
 
