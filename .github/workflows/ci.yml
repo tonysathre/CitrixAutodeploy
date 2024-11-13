@@ -12,7 +12,7 @@ jobs:
       - run: .\install-prereqs.ps1 -Force
         shell: powershell
 
-      - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
+      - run: $env:PSModulePath += ';'C:\Program Files\Citrix\PowerShellModules''
         shell: powershell
 
       - run: Get-Module -ListAvailable Citrix.*
