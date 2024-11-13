@@ -15,7 +15,7 @@ jobs:
       - run: echo 'C:\Program Files\Citrix\PowerShellModules' >> $env:GITHUB_PATH
         shell: powershell
 
-      - run: get-module -listavailable citrix*
+      - run: Get-Module -ListAvailable Citrix.*
         shell: powershell
 
       - run: .\test
