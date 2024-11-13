@@ -15,11 +15,7 @@ jobs:
       - run: |
           $env:PSModulePath += ";C:\Program Files\Citrix\PowerShellModules"
           echo $env:PSModulePath
-        shell: powershell
-
-      - run: |
           Get-Module -ListAvailable Citrix.*
-          echo $env:PSModulePath
         shell: powershell
 
       - run: .\test
