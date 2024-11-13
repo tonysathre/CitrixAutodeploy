@@ -1,3 +1,5 @@
+#Requires -Modules @{ModuleName = 'Pester'; ModuleVersion = '5.6.1'}
+
 [CmdletBinding()]
 param ()
 
@@ -41,14 +43,16 @@ Describe 'New-CtxAutodeployVM' {
     }
 
     AfterAll {
-        #@(
-        #    'Citrix.ADIdentity.Commands',
-        #    'Citrix.Broker.Commands',
-        #    'Citrix.ConfigurationLogging.Commands',
-        #    'Citrix.MachineCreation.Commands',
-        #    "${PSScriptRoot}\..\module\CitrixAutodeploy",
-        #    "${PSScriptRoot}\Pester.Helper.psm1"
-        #) | Remove-Module -Force
+        if (-not $env:CI) {
+            @(
+                'Citrix.ADIdentity.Commands',
+                'Citrix.Broker.Commands',
+                'Citrix.ConfigurationLogging.Commands',
+                'Citrix.MachineCreation.Commands',
+                "${PSScriptRoot}\..\module\CitrixAutodeploy",
+                "${PSScriptRoot}\Pester.Helper.psm1"
+            ) | Remove-Module -Force
+        }
 
         if ($VerbosePreference -eq 'Continue') {
             $global:VerbosePreference = 'SilentlyContinue'

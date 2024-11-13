@@ -1,7 +1,7 @@
 @(
     @{
         Name            = 'Pester'
-        RequiredVersion = '5.5.0'
+        RequiredVersion = '5.6.1'
     },
     @{
         Name            = 'PoShLog'

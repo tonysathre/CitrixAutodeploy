@@ -1,4 +1,4 @@
-#Requires -Modules @{ModuleName='Pester';ModuleVersion='5.5.0'}
+#Requires -Modules @{ModuleName='Pester';ModuleVersion='5.6.1'}
 
 [CmdletBinding()]
 param (
