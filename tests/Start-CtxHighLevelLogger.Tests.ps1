@@ -6,9 +6,6 @@ Describe 'Start-CtxHighLevelLogger' {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Start-CtxHighLevelLogger.ps1"
         Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
         Import-CitrixPowerShellModules
-
-        Mock Write-DebugLog {}
-        Mock Write-FatalLog {}
     }
 
     Context 'Mandatory Parameters' {
