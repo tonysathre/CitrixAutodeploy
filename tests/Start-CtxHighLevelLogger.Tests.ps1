@@ -8,6 +8,7 @@ Describe 'Start-CtxHighLevelLogger' {
         Import-CitrixPowerShellModules
 
         Mock Write-DebugLog {}
+        Mock Write-FatalLog {}
     }
 
     Context 'Mandatory Parameters' {
@@ -42,6 +43,17 @@ Describe 'Start-CtxHighLevelLogger' {
             $Logging        | Should -BeOfType 'Citrix.ConfigurationLogging.Sdk.HighLevelOperation'
             $Logging.Source | Should -Be $Params.Source
             $Logging.Text   | Should -Be $Params.Text
+        }
+    }
+
+    Context 'Error handling' {
+        It 'Should throw an exception if an error occurs' {
+            $Params = @{
+                AdminAddress = 'BadAdminAddress'
+                Text         = 'Bad AdminAddress'
+            }
+
+            { Start-CtxHighLevelLogger @Params } | Should -Throw -ExceptionType 'System.InvalidOperationException' -ExpectedMessage "An invalid URL was given for the service.*"
         }
     }
 }
