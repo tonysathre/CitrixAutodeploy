@@ -1,11 +1,45 @@
+function Enable-Logging {
+    Import-CitrixAutodeployModule
+
+    if ($VerbosePreference -eq 'Continue') {
+        Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
+    }
+
+    if ($DebugPreference -eq 'Continue') {
+        Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
+    }
+}
+
+function Import-CitrixPowerShellModules {
+    @(
+        'Citrix.ADIdentity.Commands',
+        'Citrix.Broker.Commands',
+        'Citrix.ConfigurationLogging.Commands',
+        'Citrix.MachineCreation.Commands'
+    ) | Import-Module -Force -ErrorAction Stop 3> $null
+}
+
+function Remove-CitrixPowerShellModules {
+    @(
+        'Citrix.ADIdentity.Commands',
+        'Citrix.Broker.Commands',
+        'Citrix.ConfigurationLogging.Commands',
+        'Citrix.MachineCreation.Commands'
+    ) | Remove-Module -Force
+}
+
 function Import-CitrixAutodeployModule {
-    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop 3> $null
+}
+
+function Remove-CitrixAutodeployModule {
+    "${PSScriptRoot}\..\module\CitrixAutodeploy" | Remove-Module -Force
 }
 
 function New-MockAdminAddress {
     return 'test-admin-address'
 }
-function New-MockBrokerCatalog {
+function New-BrokerCatalogMock {
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
         Name        = 'MockBrokerCatalog'
         CatalogName = 'MockBrokerCatalog'
@@ -13,7 +47,7 @@ function New-MockBrokerCatalog {
     }
 }
 
-function New-MockDesktopGroup {
+function New-BrokerDesktopGroupMock {
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.DesktopGroup]) -Properties @{
         Name             = 'MockDesktopGroup'
         DesktopGroupName = 'MockDesktopGroup'
@@ -21,7 +55,7 @@ function New-MockDesktopGroup {
     }
 }
 
-function New-MockBrokerMachine {
+function New-BrokerMachineMock {
     $ADAccount = New-MockADComputer
 
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{
@@ -31,7 +65,7 @@ function New-MockBrokerMachine {
     }
 }
 
-function New-MockCtxHighLevelLogger {
+function New-CtxHighLevelLoggerMock {
     return New-MockObject -Type ([Citrix.ConfigurationLogging.Sdk.HighLevelOperation]) -Properties @{
         Id = [guid]::NewGuid()
     }
@@ -65,7 +99,7 @@ function New-MockADComputer {
     }
 }
 
-function New-MockProvVM {
+function New-ProvVMMock {
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -76,23 +110,23 @@ function New-MockProvVM {
     return New-MockObject -Type ([Citrix.MachineCreation.Sdk.ProvisionedVirtualMachine]) -Properties @{
         ADAccountName          = $ADAccount.SamAccountName
         ADAccountSid           = $ADAccount.SID
-        ProvisioningSchemeName = (New-MockProvScheme).ProvisioningSchemeName
+        ProvisioningSchemeName = (New-ProvSchemeMock).ProvisioningSchemeName
         VMName                 = $ADAccount.Name
         Uid                    = 123
         Lock                   = $Lock
     }
 }
 
-function Get-MockProvVM {
+function Get-ProvVMMock {
     param (
         [Parameter()]
         [bool]$Lock = $false
     )
 
-    return New-MockProvVM @PSBoundParameters
+    return New-ProvVMMock @PSBoundParameters
 }
 
-function New-MockProvTask {
+function New-ProvTaskMock {
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Finished', 'Running')]
@@ -113,23 +147,23 @@ function New-MockProvTask {
     }
 }
 
-function Get-MockProvTask {
+function Get-ProvTaskMock {
     return [guid]::NewGuid()
 }
 
-function Unlock-MockProvVM {
+function Unlock-ProvVMMock {
     Mock Unlock-ProvVM {}
 }
 
-function Remove-MockProvVM {
+function  Remove-ProvVMMock {
     Mock Remove-ProvVM {}
 }
 
-function Remove-MockAcctADAccount {
+function Remove-AcctADAccountMock {
     Mock Remove-AcctADAccount {}
 }
 
-function Get-MockAcctIdentityPool {
+function Get-AcctIdentityPoolMock {
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -141,7 +175,7 @@ function Get-MockAcctIdentityPool {
     }
 }
 
-function New-MockAcctADAccount {
+function New-AcctADAccountMock {
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -155,7 +189,7 @@ function New-MockAcctADAccount {
             @{
                 ADAccountName    = "{0}\{1}" -f $Domain, $ADAccount.SamAccountName
                 Domain           = $Domain
-                IdentityPoolName = (Get-MockAcctIdentityPool).IdentityPoolName
+                IdentityPoolName = (Get-AcctIdentityPoolMock).IdentityPoolName
                 ADAccountSid     = $ADAccount.SID
                 Lock             = $Lock
             }
@@ -163,16 +197,55 @@ function New-MockAcctADAccount {
     }
 }
 
-function New-MockProvScheme {
+function New-ProvSchemeMock {
     return New-MockObject -Type ([Citrix.MachineCreation.Sdk.ProvisioningScheme]) -Properties @{
         ProvisioningSchemeName = 'MockProvScheme'
     }
 }
 
-function Get-MockProvScheme {
-    return New-MockProvScheme
+function Get-ProvSchemeMock {
+    return New-ProvSchemeMock
 }
 
-function Add-MockBrokerMachine {
+function Add-BrokerMachineMock {
     return $null
+}
+
+function Start-LogHighLevelOperationMock {
+    param (
+        [Parameter(Mandatory)]
+        [string]$AdminAddress = (New-MockAdminAddress),
+
+        [Parameter()]
+        [string]$Source = 'Citrix Autodeploy',
+
+        [Parameter(Mandatory)]
+        [string]$Text
+    )
+
+    return New-MockObject -Type ([Citrix.ConfigurationLogging.Sdk.HighLevelOperation]) -Properties @{
+        Id            = [guid]::NewGuid()
+        Source        = $Source
+        OperationType = 'AdminActivity'
+        Text          = $Text
+    }
+}
+
+function Stop-LogHighLevelOperationMock {
+    param (
+        [Parameter(Mandatory)]
+        [string]$AdminAddress = (New-MockAdminAddress),
+
+        [Parameter()]
+        [guid]$HighLevelOperationId,
+
+        [Parameter()]
+        [bool]$IsSuccessful
+    )
+
+    return $null
+}
+
+function New-TempFile {
+    return [System.IO.Path]::GetTempFileName()
 }
