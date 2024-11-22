@@ -1,11 +1,6 @@
 Describe 'Invoke-CtxAutodeployTask' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Invoke-CtxAutodeployTask.ps1"
-        Mock Write-InfoLog {}
-        Mock Write-DebugLog {}
-        Mock Write-ErrorLog {}
-        Mock Write-WarningLog {}
-        Mock Write-VerboseLog {}
     }
 
     $TestCases = @(

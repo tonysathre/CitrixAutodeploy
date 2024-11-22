@@ -7,13 +7,9 @@ Describe 'Test-MachineCountExceedsLimit' {
             "Citrix.MachineCreation.Commands"
         ) | Import-Module -Force -ErrorAction Stop 3> $null
 
-        $MockDesktopGroup = New-MockObject -Type ([Citrix.Broker.Admin.SDK.DesktopGroup]) -Properties @{
-            Name = 'MockDesktopGroup'
-        }
+        $MockDesktopGroup = New-BrokerDesktopGroup
 
-        $MockCatalog = New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
-            Name = 'MockCatalog'
-        }
+        $MockCatalog = New-BrokerCatalogMock
     }
 
     BeforeAll {
@@ -21,12 +17,6 @@ Describe 'Test-MachineCountExceedsLimit' {
     }
 
     BeforeEach {
-        Mock Write-InfoLog    {}
-        Mock Write-DebugLog   {}
-        Mock Write-ErrorLog   {}
-        Mock Write-VerboseLog {}
-        Mock Write-WarningLog {}
-
         Mock Get-BrokerMachine {
         return @(1..5 | ForEach-Object {
                             New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{

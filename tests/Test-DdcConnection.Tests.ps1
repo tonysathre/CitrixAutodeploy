@@ -8,7 +8,7 @@ Describe 'Test-DdcConnection' {
     Context 'When connection is successful' {
         It "Should return $true using protocol <_>" -ForEach $Protocols {
             Mock Invoke-RestMethod { return $true }
-            $Result = Test-DdcConnection -AdminAddress 'NACORXDVDPW01' -Protocol $_
+            $Result = Test-DdcConnection -AdminAddress 'test-admin-address' -Protocol $_
             $Result | Should -Be $true
         }
     }
@@ -17,7 +17,7 @@ Describe 'Test-DdcConnection' {
         It 'Should return $false using protocol <_>' -ForEach $Protocols {
             Mock Invoke-RestMethod { return $false }
 
-            $Result = Test-DdcConnection -AdminAddress 'NACORXDVDPW01' -Protocol 'https'
+            $Result = Test-DdcConnection -AdminAddress 'test-admin-address' -Protocol 'https'
             $Result | Should -Be $false
         }
     }

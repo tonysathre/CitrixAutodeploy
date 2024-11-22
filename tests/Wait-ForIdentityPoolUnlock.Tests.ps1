@@ -28,7 +28,7 @@ Describe "Wait-ForIdentityPoolUnlock" {
 
         Mock Start-Sleep { $IdentityPool.Lock = $false }
 
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Not -Throw
+        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 -AdminAddress 'test-admin-address'} | Should -Not -Throw
     }
 
     It "Should timeout if the identity pool remains locked" {
@@ -36,7 +36,7 @@ Describe "Wait-ForIdentityPoolUnlock" {
 
         Mock Start-Sleep {}
 
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Throw
+        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 -AdminAddress 'test-admin-address' } | Should -Throw
     }
 
     It "Should not wait if the identity pool is not locked" {
@@ -44,7 +44,7 @@ Describe "Wait-ForIdentityPoolUnlock" {
 
         Mock Start-Sleep {}
 
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Not -Throw
+        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 -AdminAddress 'test-admin-address' } | Should -Not -Throw
 
         Should -Invoke Start-Sleep -Exactly 0
     }
