@@ -16,7 +16,7 @@ function Initialize-CtxAutodeployEnv {
         $Modules | Import-Module -Force -ErrorAction Stop 3> $null
     }
     catch {
-        Write-ErrorLog -Message "Failed to import module: {0}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $Modules
+        Write-FatalLog -Message "Failed to import module: {0}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $Modules
         throw
     }
 }

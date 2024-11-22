@@ -28,7 +28,7 @@ function Initialize-CtxAutodeployLogger {
     }
 
     if ($AddEnrichWithExceptionDetails) {
-        Write-VerboseLog -Message 'Adding enrich with exception details to logger'
+        Write-VerboseLog -Message 'Adding enrichment with exception details to logger'
         $LoggerConfig = $LoggerConfig | Add-EnrichWithExceptionDetails
     }
 
@@ -38,7 +38,8 @@ function Initialize-CtxAutodeployLogger {
     }
     catch {
         Write-ErrorLog -Message "Failed to start logger" -Exception $_.Exception -ErrorRecord $_
+        throw
     }
 
-    return $Logger
+    return $Logger, $LoggerConfig
 }
