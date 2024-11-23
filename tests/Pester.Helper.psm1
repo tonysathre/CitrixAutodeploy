@@ -1,11 +1,15 @@
 function Enable-Logging {
+    [CmdletBinding()]
+    param ()
     Import-CitrixAutodeployModule
 
-    if ($VerbosePreference -eq 'Continue') {
+    if ($PSBoundParameters['Verbose']) {
+        $VerbosePreference -eq 'Continue'
         Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
     }
 
-    if ($DebugPreference -eq 'Continue') {
+    if ($PSBoundParameters['Debug']) {
+        $DebugPreference -eq 'Continue'
         Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
     }
 }

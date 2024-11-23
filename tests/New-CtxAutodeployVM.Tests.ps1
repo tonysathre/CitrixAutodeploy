@@ -5,15 +5,23 @@ Describe 'New-CtxAutodeployVM' {
     BeforeAll {
         Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop
         Import-CitrixPowerShellModules
-        Enable-Logging
 
-        Mock Get-ProvScheme       { return Get-ProvSchemeMock                    } -Module CitrixAutodeploy
-        Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $false } -Module CitrixAutodeploy
-        Mock New-AcctADAccount    { return New-AcctADAccountMock                 } -Module CitrixAutodeploy
-        Mock New-ProvVM           { return Get-ProvTaskMock                      } -Module CitrixAutodeploy
-        Mock New-BrokerMachine    { return New-BrokerMachineMock                 } -Module CitrixAutodeploy
-        Mock Get-ProvTask         { return Get-ProvTaskMock                      } -Module CitrixAutodeploy
-        Mock Add-BrokerMachine    { return Add-BrokerMachineMock                 } -Module CitrixAutodeploy
+
+        if ($VerbosePreference -eq 'Continue') {
+            Enable-Logging -Verbose
+        }
+
+        if ($DebugPreference -eq 'Continue') {
+            Enable-Logging -Debug
+        }
+
+        Mock Get-ProvScheme       { return Get-ProvSchemeMock                    }
+        Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $false }
+        Mock New-AcctADAccount    { return New-AcctADAccountMock                 }
+        Mock New-ProvVM           { return Get-ProvTaskMock                      }
+        Mock New-BrokerMachine    { return New-BrokerMachineMock                 }
+        Mock Get-ProvTask         { return Get-ProvTaskMock                      }
+        Mock Add-BrokerMachine    { return Add-BrokerMachineMock                 }
 
         $Params = @{
             AdminAddress  = New-MockAdminAddress
@@ -24,13 +32,12 @@ Describe 'New-CtxAutodeployVM' {
     }
 
     BeforeEach {
-
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\New-CtxAutodeployVM.ps1"
     }
 
     AfterAll {
         if (-not $env:CI) {
             Remove-CitrixPowerShellModules
-            Remove-CitrixAutodeployModule
         }
 
         if ($VerbosePreference -eq 'Continue') {
@@ -55,13 +62,13 @@ Describe 'New-CtxAutodeployVM' {
 
     It 'should call the required Citrix cmdlets' {
         { New-CtxAutodeployVM @Params } | Should -Not -Throw
-        Should -Invoke Get-ProvScheme       -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke Get-AcctIdentityPool -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke New-AcctADAccount    -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke New-ProvVM           -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke New-BrokerMachine    -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke Get-ProvTask         -Times 1 -ModuleName CitrixAutodeploy
-        Should -Invoke Add-BrokerMachine    -Times 1 -ModuleName CitrixAutodeploy
+        Should -Invoke Get-ProvScheme       -Times 1
+        Should -Invoke Get-AcctIdentityPool -Times 1
+        Should -Invoke New-AcctADAccount    -Times 1
+        Should -Invoke New-ProvVM           -Times 1
+        Should -Invoke New-BrokerMachine    -Times 1
+        Should -Invoke Get-ProvTask         -Times 1
+        Should -Invoke Add-BrokerMachine    -Times 1
     }
 
     Context 'when identity pool is locked' {
@@ -77,27 +84,27 @@ Describe 'New-CtxAutodeployVM' {
 
     Context 'when an error occurs' {
         BeforeEach {
-            Mock Write-ErrorLog {} -Module CitrixAutodeploy
+            Mock Write-ErrorLog {}
         }
 
         It 'should log the error' {
-            Mock Get-ProvScheme { throw 'MockException' } -Module CitrixAutodeploy
+            Mock Get-ProvScheme { throw 'MockException' }
             { New-CtxAutodeployVM @Params } | Should -Throw
-            Should -Invoke Write-ErrorLog -Times 1 -Module CitrixAutodeploy
+            Should -Invoke Write-ErrorLog -Times 1
         }
 
         It 'should throw an exception' {
-            Mock Get-ProvScheme { throw 'MockException' } -Module CitrixAutodeploy
+            Mock Get-ProvScheme { throw 'MockException' }
             { New-CtxAutodeployVM @Params } | Should -Throw
         }
 
         It 'should attempt to rollback changes' {
             Mock Write-ErrorLog {}
-            Mock New-ProvVM           { return Get-ProvTaskMock  } -Module CitrixAutodeploy
-            Mock Get-ProvTask         { return New-ProvTaskMock -Status Finished -TerminatingError 'MockTerminatingError' -Active $false  } -Module CitrixAutodeploy
-            Mock Unlock-ProvVM        { return $null } -Module CitrixAutodeploy
-            Mock Remove-ProvVM        { return $null } -Module CitrixAutodeploy
-            Mock Remove-AcctADAccount { return $null } -Module CitrixAutodeploy
+            Mock New-ProvVM           { return Get-ProvTaskMock  }
+            Mock Get-ProvTask         { return New-ProvTaskMock -Status Finished -TerminatingError 'MockTerminatingError' -Active $false  }
+            Mock Unlock-ProvVM        { return $null }
+            Mock Remove-ProvVM        { return $null }
+            Mock Remove-AcctADAccount { return $null }
 
             New-CtxAutodeployVM @Params
 
