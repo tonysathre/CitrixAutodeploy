@@ -6,32 +6,33 @@ Describe 'Invoke-CtxAutodeployTask' {
     $TestCases = @(
         @{
             FilePath     = 'PreTask'
-            Type = 'Pre'
+            Type         = 'Pre'
             ArgumentList = @()
         },
         @{
             FilePath     = 'PostTask'
-            Type = 'Post'
+            Type         = 'Post'
             ArgumentList = @()
         }
     )
 
-    It 'Should execute <_.Task>' -TestCases $TestCases {
+    It 'Should execute <_.FilePath>' -TestCases $TestCases {
         param($FilePath, $Type, $ArgumentList)
 
         $ExpectedOutput = "A test ${Type} script was executed"
-        $FilePath           = "${PSScriptRoot}\test_${Type}.ps1"
+        $FilePath       = "${PSScriptRoot}\test_${FilePath}.ps1"
+        Set-Content -Path $FilePath -Value "'${ExpectedOutput}'"
 
         $Params = @{
-            Task    = $Task
-            Context = 'PreTaskTest'
-            Type    = $Type
+            FilePath     = $FilePath
+            Context      = 'PreTaskTest'
+            Type         = $Type
             ArgumentList = $ArgumentList
         }
 
-        Set-Content -Path $Task -Value "'${ExpectedOutput}'"
-
         $ActualOutput = Invoke-CtxAutodeployTask @Params
         $ActualOutput | Should -Be $ExpectedOutput
+
+        Remove-Item -Path $FilePath -Force
     }
 }
