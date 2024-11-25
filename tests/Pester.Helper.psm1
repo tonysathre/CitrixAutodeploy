@@ -40,8 +40,9 @@ function New-MockAdminAddress {
     [CmdletBinding()]
     param ()
 
-    return 'test-admin-address'
+    return 'mock-admin-address'
 }
+
 function New-BrokerCatalogMock {
     [CmdletBinding()]
     param ()

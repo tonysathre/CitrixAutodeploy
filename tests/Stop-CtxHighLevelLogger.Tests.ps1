@@ -1,3 +1,6 @@
+[CmdletBinding()]
+param ()
+
 Describe 'Stop-CtxHighLevelLogger' {
     BeforeAll {
         . "$PSScriptRoot\..\module\CitrixAutodeploy\functions\public\Stop-CtxHighLevelLogger.ps1"

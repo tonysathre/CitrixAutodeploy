@@ -52,6 +52,6 @@ try {
 catch {}
 
 finally {
-    if ($Logger) {$Logger | Close-Logger}
+    Close-Logger
 }
 

@@ -55,10 +55,14 @@ Describe 'Invoke-CtxAutodeployTask' {
         }
 
         It 'Should log an error' {
+            Mock Write-ErrorLog {}
+
             $InvalidCommand = 'Non-ExistentCmdlet'
             Set-Content -Path $FilePath -Value $InvalidCommand
 
             { Invoke-CtxAutodeployTask @_ } | Should -Throw -ErrorId CommandNotFoundException -ExpectedMessage "The term '${InvalidCommand}' is not recognized as the name of a cmdlet*"
+
+            Should -Invoke Write-ErrorLog -Exactly 1 -Scope It
         }
     }
 }
