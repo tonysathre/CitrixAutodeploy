@@ -22,6 +22,8 @@ Describe 'Invoke-CtxAutodeployTask' {
             $global:DebugPreference = 'SilentlyContinue'
             Close-Logger
         }
+
+        "${PSScriptRoot}\test_PreTask.ps1", "${PSScriptRoot}\test_PostTask.ps1" | Remove-Item -Force
     }
 
     $TestCases = @(
@@ -30,8 +32,7 @@ Describe 'Invoke-CtxAutodeployTask' {
             Type         = 'Pre'
             Context      = 'PreTaskContext'
             ArgumentList = @(@{
-                    Property1 = 'One'
-                    Property2 = 'Two'
+                Property1 = 'One'
             })
         },
         @{
@@ -40,31 +41,27 @@ Describe 'Invoke-CtxAutodeployTask' {
             Context      = 'PostTaskContext'
             ArgumentList = @(@{
                 Property1 = 'One'
-                Property2 = 'Two'
             })
         }
     )
 
-    It 'Should execute <_.Task>' -ForEach $TestCases {
+    It 'Should execute <_.Type> task script' -ForEach $TestCases {
         param($FilePath, $Type, $Context, $ArgumentList)
 
         $ExpectedOutput = "A test ${Type} script was executed"
+        Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
 
         $ActualOutput = Invoke-CtxAutodeployTask @PSBoundParameters
         $ActualOutput | Should -Be $ExpectedOutput
-
-        Remove-Item -Path $FilePath -Force
     }
 
-    # TODO(tsathre): Come up with a better test name
-    It 'ArgumentList should contain stuff' -ForEach $TestCases {
-        param($FilePath, $Type, $ArgumentList)
+    It 'ArgumentList properties should be accessible in <_.Type> task script' -ForEach $TestCases {
+        param($FilePath, $Type, $Context, $ArgumentList)
 
-    }
+        $ExpectedOutput = '{0}' -f $ArgumentList.Property1
+        Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
 
-    # TODO(tsathre): Come up with a better test name
-    It 'ArgumentList should contain stuff' -ForEach $TestCases {
-        param($FilePath, $Type, $ArgumentList)
-
+        $ActualOutput = Invoke-CtxAutodeployTask @PSBoundParameters
+        $ActualOutput | Should -Be $ArgumentList.Property1
     }
 }
