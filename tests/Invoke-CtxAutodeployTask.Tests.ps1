@@ -30,23 +30,35 @@ Describe 'Invoke-CtxAutodeployTask' {
         }
     )
 
-    It 'Should execute <_.Type> task script' -ForEach $TestCases {
-        param($FilePath, $Type, $Context, $ArgumentList)
-
+    It 'Should execute <_.Type> task script successfully' -ForEach $TestCases {
         $ExpectedOutput = "A test ${Type} script was executed"
         Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
 
-        $ActualOutput = Invoke-CtxAutodeployTask @PSBoundParameters
+        $ActualOutput = Invoke-CtxAutodeployTask @_
         $ActualOutput | Should -Be $ExpectedOutput
     }
 
     It 'ArgumentList properties should be accessible in <_.Type> task script' -ForEach $TestCases {
-        param($FilePath, $Type, $Context, $ArgumentList)
-
         $ExpectedOutput = '{0}' -f $ArgumentList.Property1
         Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
 
-        $ActualOutput = Invoke-CtxAutodeployTask @PSBoundParameters
+        $ActualOutput = Invoke-CtxAutodeployTask @_
         $ActualOutput | Should -Be $ArgumentList.Property1
+    }
+
+    Context 'When an error occurs in a <_.Type> task script' -ForEach $TestCases {
+        It 'Should throw an exception' {
+            $InvalidCommand = 'Non-ExistentCmdlet'
+            Set-Content -Path $FilePath -Value $InvalidCommand
+
+            { Invoke-CtxAutodeployTask @_ } | Should -Throw -ErrorId CommandNotFoundException -ExpectedMessage "The term '${InvalidCommand}' is not recognized as the name of a cmdlet*"
+        }
+
+        It 'Should log an error' {
+            $InvalidCommand = 'Non-ExistentCmdlet'
+            Set-Content -Path $FilePath -Value $InvalidCommand
+
+            { Invoke-CtxAutodeployTask @_ } | Should -Throw -ErrorId CommandNotFoundException -ExpectedMessage "The term '${InvalidCommand}' is not recognized as the name of a cmdlet*"
+        }
     }
 }
