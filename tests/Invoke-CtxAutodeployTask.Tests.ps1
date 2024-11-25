@@ -5,24 +5,9 @@ Describe 'Invoke-CtxAutodeployTask' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Invoke-CtxAutodeployTask.ps1"
         Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop
-        Enable-Logging
     }
 
     AfterAll {
-        if (-not $env:CI) {
-            Remove-CitrixAutodeployModule
-        }
-
-        if ($VerbosePreference -eq 'Continue') {
-            $global:VerbosePreference = 'SilentlyContinue'
-            Close-Logger
-        }
-
-        if ($DebugPreference -eq 'Continue') {
-            $global:DebugPreference = 'SilentlyContinue'
-            Close-Logger
-        }
-
         "${PSScriptRoot}\test_PreTask.ps1", "${PSScriptRoot}\test_PostTask.ps1" | Remove-Item -Force
     }
 

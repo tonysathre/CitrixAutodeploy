@@ -1,19 +1,19 @@
 function Enable-Logging {
     [CmdletBinding()]
     param ()
-    Import-CitrixAutodeployModule
+
+    . ${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1
 
     if ($PSBoundParameters['Verbose']) {
-        $VerbosePreference -eq 'Continue'
+        $global:VerbosePreference -eq 'Continue'
         Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
     }
 
     if ($PSBoundParameters['Debug']) {
-        $DebugPreference -eq 'Continue'
+        $global:DebugPreference -eq 'Continue'
         Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
     }
 }
-
 function Import-CitrixPowerShellModules {
     @(
         'Citrix.ADIdentity.Commands',
@@ -33,7 +33,7 @@ function Remove-CitrixPowerShellModules {
 }
 
 function Import-CitrixAutodeployModule {
-    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop 3> $null
+    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop
 }
 
 function Remove-CitrixAutodeployModule {
