@@ -32,10 +32,17 @@ Describe 'Stop-CtxHighLevelLogger' {
 
             { Stop-CtxHighLevelLogger @Params } | Should -Throw -ExceptionType 'System.InvalidOperationException' -ExpectedMessage 'An invalid URL was given for the service.*'
         }
-        # FIX(tsathre): Not working
+
         It 'Should log a fatal error' {
-            Mock Write-FatalLog { }
+            $Params = @{
+                AdminAddress         = 'BadAdminAddress'
+                HighLevelOperationId = (New-CtxHighLevelLoggerMock).Id
+                IsSuccessful         = $false
+            }
+            Mock Write-FatalLog {}
+
+            { Stop-CtxHighLevelLogger @Params } | Should -Throw -ExceptionType 'System.InvalidOperationException' -ExpectedMessage 'An invalid URL was given for the service.*'
             Should -Invoke Write-FatalLog -Exactly 1 -Scope It
-        } -Skip
+        }
     }
 }
