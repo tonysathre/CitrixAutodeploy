@@ -1,20 +1,7 @@
-function Enable-Logging {
+function Import-CitrixPowerShellModules {
     [CmdletBinding()]
     param ()
 
-    . ${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1
-
-    if ($PSBoundParameters['Verbose']) {
-        $global:VerbosePreference -eq 'Continue'
-        Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
-    }
-
-    if ($PSBoundParameters['Debug']) {
-        $global:DebugPreference -eq 'Continue'
-        Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
-    }
-}
-function Import-CitrixPowerShellModules {
     @(
         'Citrix.ADIdentity.Commands',
         'Citrix.Broker.Commands',
@@ -24,6 +11,9 @@ function Import-CitrixPowerShellModules {
 }
 
 function Remove-CitrixPowerShellModules {
+    [CmdletBinding()]
+    param ()
+
     @(
         'Citrix.ADIdentity.Commands',
         'Citrix.Broker.Commands',
@@ -33,17 +23,29 @@ function Remove-CitrixPowerShellModules {
 }
 
 function Import-CitrixAutodeployModule {
+    [CmdletBinding()]
+    param ()
+
     Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop
 }
 
 function Remove-CitrixAutodeployModule {
+    [CmdletBinding()]
+    param ()
+
     Get-Module CitrixAutodeploy | Remove-Module -Force
 }
 
 function New-MockAdminAddress {
+    [CmdletBinding()]
+    param ()
+
     return 'test-admin-address'
 }
 function New-BrokerCatalogMock {
+    [CmdletBinding()]
+    param ()
+
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
         Name        = 'MockBrokerCatalog'
         CatalogName = 'MockBrokerCatalog'
@@ -52,6 +54,9 @@ function New-BrokerCatalogMock {
 }
 
 function New-BrokerDesktopGroupMock {
+    [CmdletBinding()]
+    param ()
+
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.DesktopGroup]) -Properties @{
         Name             = 'MockDesktopGroup'
         DesktopGroupName = 'MockDesktopGroup'
@@ -60,6 +65,9 @@ function New-BrokerDesktopGroupMock {
 }
 
 function New-BrokerMachineMock {
+    [CmdletBinding()]
+    param ()
+
     $ADAccount = New-MockADComputer
 
     return New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{
@@ -70,12 +78,16 @@ function New-BrokerMachineMock {
 }
 
 function New-CtxHighLevelLoggerMock {
+    [CmdletBinding()]
+    param ()
+
     return New-MockObject -Type ([Citrix.ConfigurationLogging.Sdk.HighLevelOperation]) -Properties @{
         Id = [guid]::NewGuid()
     }
 }
 
 function New-RandomComputerName {
+    [CmdletBinding()]
     param (
         [Parameter()]
         [int]$Length = 8
@@ -88,6 +100,9 @@ function New-RandomComputerName {
 }
 
 function New-MockADComputer {
+    [CmdletBinding()]
+    param ()
+
     $SidBytes = New-Object byte[] 28
     [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($SidBytes)
     $SidBytes[0] = 1  # Set the revision number to 1
@@ -104,6 +119,7 @@ function New-MockADComputer {
 }
 
 function New-ProvVMMock {
+    [CmdletBinding()]
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -122,6 +138,7 @@ function New-ProvVMMock {
 }
 
 function Get-ProvVMMock {
+    [CmdletBinding()]
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -131,6 +148,7 @@ function Get-ProvVMMock {
 }
 
 function New-ProvTaskMock {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [ValidateSet('Finished', 'Running')]
@@ -152,22 +170,35 @@ function New-ProvTaskMock {
 }
 
 function Get-ProvTaskMock {
+    [CmdletBinding()]
+    param ()
+
     return [guid]::NewGuid()
 }
 
 function Unlock-ProvVMMock {
+    [CmdletBinding()]
+    param ()
+
     Mock Unlock-ProvVM {}
 }
 
 function  Remove-ProvVMMock {
+    [CmdletBinding()]
+    param ()
+
     Mock Remove-ProvVM {}
 }
 
 function Remove-AcctADAccountMock {
+    [CmdletBinding()]
+    param ()
+
     Mock Remove-AcctADAccount {}
 }
 
 function Get-AcctIdentityPoolMock {
+    [CmdletBinding()]
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -180,6 +211,7 @@ function Get-AcctIdentityPoolMock {
 }
 
 function New-AcctADAccountMock {
+    [CmdletBinding()]
     param (
         [Parameter()]
         [bool]$Lock = $false
@@ -202,20 +234,30 @@ function New-AcctADAccountMock {
 }
 
 function New-ProvSchemeMock {
+    [CmdletBinding()]
+    param ()
+
     return New-MockObject -Type ([Citrix.MachineCreation.Sdk.ProvisioningScheme]) -Properties @{
         ProvisioningSchemeName = 'MockProvScheme'
     }
 }
 
 function Get-ProvSchemeMock {
+    [CmdletBinding()]
+    param ()
+
     return New-ProvSchemeMock
 }
 
 function Add-BrokerMachineMock {
+    [CmdletBinding()]
+    param ()
+
     return $null
 }
 
 function Start-LogHighLevelOperationMock {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$AdminAddress = (New-MockAdminAddress),
@@ -236,6 +278,7 @@ function Start-LogHighLevelOperationMock {
 }
 
 function Stop-LogHighLevelOperationMock {
+    [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
         [string]$AdminAddress = (New-MockAdminAddress),
@@ -251,5 +294,8 @@ function Stop-LogHighLevelOperationMock {
 }
 
 function New-TempFile {
+    [CmdletBinding()]
+    param ()
+
     return [System.IO.Path]::GetTempFileName()
 }
