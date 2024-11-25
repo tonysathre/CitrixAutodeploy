@@ -2,35 +2,23 @@
 param ()
 
 Describe 'Initialize-CtxAutodeployLogger' {
-    BeforeDiscovery {
-        $global:VerbosePreference = 'SilentlyContinue'
-        $global:DebugPreference   = 'SilentlyContinue'
-    }
-
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1"
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
-        Import-CitrixAutodeployModule
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        Import-CitrixAutodeployModule 3> $null 4> $null
     }
 
-    BeforeEach {
-        $PreferenceVars = @(
-            (Get-Variable 'VerbosePreference')
-            (Get-Variable 'DebugPreference')
-        )
-    }
-
-    AfterEach {
-        $script:Logger | Close-Logger
+    AfterAll {
+        Close-Logger
     }
 
     It 'Should return an object of type Serilog.Core.Logger' {
-        $script:Logger, $LoggerConfig = Initialize-CtxAutodeployLogger
+        $Logger, $LoggerConfig = Initialize-CtxAutodeployLogger
         $Logger | Should -BeOfType 'Serilog.Core.Logger'
     }
 
     It 'Should set the LogLevel to Debug' {
-        $script:Logger, $LoggerConfig = Initialize-CtxAutodeployLogger -LogLevel 'Debug'
+        $Logger, $LoggerConfig = Initialize-CtxAutodeployLogger -LogLevel 'Debug'
         Write-Host ([Serilog.Configuration.LoggerSettingsConfiguration].GetProperties($LoggerConfig))
 
         $LogLevel = $LoggerConfig.MinimumLevel.ControlledSwitch.MinimumLevel.ToString()

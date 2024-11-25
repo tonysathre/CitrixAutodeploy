@@ -3,7 +3,7 @@ param ()
 
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Get-CtxAutodeployConfig.ps1"
     }
 

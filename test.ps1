@@ -25,12 +25,33 @@ param (
     [bool]$CodeCoverageEnabled = $false
 )
 
-$PesterConfiguration = New-PesterConfiguration
-$PesterConfiguration.Output.Verbosity                   = $Output
-$PesterConfiguration.Run.Path                           = $Tests
-$PesterConfiguration.Output.StackTraceVerbosity         = $StackTraceVerbosity
-$PesterConfiguration.CodeCoverage.Enabled               = $CodeCoverageEnabled
-$PesterConfiguration.CodeCoverage.Path                  = $Tests
-$PesterConfiguration.CodeCoverage.CoveragePercentTarget = 75
+try {
+    if ($PSBoundParameters['Verbose']) {
+        . ${PSScriptRoot}\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1 4> $null
+        $VerbosePreference -eq 'Continue'
+        $Logger = Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
+    }
 
-Invoke-Pester -Configuration $PesterConfiguration
+    if ($PSBoundParameters['Debug']) {
+        . ${PSScriptRoot}\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1 4> $null
+        $DebugPreference -eq 'Continue'
+        $Logger = Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
+    }
+
+    $PesterConfiguration = New-PesterConfiguration
+    $PesterConfiguration.Output.Verbosity = $Output
+    $PesterConfiguration.Run.Path = $Tests
+    $PesterConfiguration.Output.StackTraceVerbosity = $StackTraceVerbosity
+    $PesterConfiguration.CodeCoverage.Enabled = $CodeCoverageEnabled
+    $PesterConfiguration.CodeCoverage.Path = $Tests
+    $PesterConfiguration.CodeCoverage.CoveragePercentTarget = 75
+
+    Invoke-Pester -Configuration $PesterConfiguration
+}
+
+catch {}
+
+finally {
+    if ($Logger) {$Logger | Close-Logger}
+}
+

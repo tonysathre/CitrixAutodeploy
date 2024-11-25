@@ -29,7 +29,7 @@ if ($DryRun) {
     $LogOutputTemplate = '[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [DRYRUN] {Message:lj}{NewLine}{Exception}'
 }
 
-Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop 3> $null
+Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop 3> $null 4> $null
 
 if ($LogLevel -ne 'None') {
     $Logger = Initialize-CtxAutodeployLogger -LogLevel $LogLevel -LogFile $LogFile -LogOutputTemplate $LogOutputTemplate

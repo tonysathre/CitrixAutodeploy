@@ -20,7 +20,7 @@
 
 Describe "Wait-ForIdentityPoolUnlock" {
     BeforeAll {
-        Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop 3> $null 4> $null
     }
 
     It "Should wait until the identity pool is unlocked within the timeout" {

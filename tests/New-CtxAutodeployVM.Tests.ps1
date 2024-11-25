@@ -3,17 +3,8 @@ param ()
 
 Describe 'New-CtxAutodeployVM' {
     BeforeAll {
-        Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop
-        Import-CitrixPowerShellModules
-
-
-        if ($VerbosePreference -eq 'Continue') {
-            Enable-Logging -Verbose
-        }
-
-        if ($DebugPreference -eq 'Continue') {
-            Enable-Logging -Debug
-        }
+        Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop 3> $null 4> $null
+        Import-CitrixPowerShellModules 3> $null 4> $null
 
         Mock Get-ProvScheme       { return Get-ProvSchemeMock                    }
         Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $false }
@@ -38,16 +29,6 @@ Describe 'New-CtxAutodeployVM' {
     AfterAll {
         if (-not $env:CI) {
             Remove-CitrixPowerShellModules
-        }
-
-        if ($VerbosePreference -eq 'Continue') {
-            $global:VerbosePreference = 'SilentlyContinue'
-            Close-Logger
-        }
-
-        if ($DebugPreference -eq 'Continue') {
-            $global:DebugPreference = 'SilentlyContinue'
-            Close-Logger
         }
     }
 

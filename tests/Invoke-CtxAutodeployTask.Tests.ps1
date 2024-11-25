@@ -4,7 +4,7 @@ param ()
 Describe 'Invoke-CtxAutodeployTask' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Invoke-CtxAutodeployTask.ps1"
-        Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop
+        Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop 3> $null 4> $null
     }
 
     AfterAll {

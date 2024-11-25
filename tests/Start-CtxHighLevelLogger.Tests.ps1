@@ -4,8 +4,8 @@ param ()
 Describe 'Start-CtxHighLevelLogger' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Start-CtxHighLevelLogger.ps1"
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
-        Import-CitrixPowerShellModules
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        Import-CitrixPowerShellModules 3> $null 4> $null
     }
 
     Context 'Mandatory Parameters' {

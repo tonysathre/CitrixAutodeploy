@@ -1,9 +1,8 @@
 Describe 'Stop-CtxHighLevelLogger' {
     BeforeAll {
         . "$PSScriptRoot\..\module\CitrixAutodeploy\functions\public\Stop-CtxHighLevelLogger.ps1"
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
-        Import-CitrixPowerShellModules
-        Enable-Logging
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        Import-CitrixPowerShellModules 3> $null 4> $null
     }
 
     It 'Should call Stop-LogHighLevelOperation with correct parameters' {

@@ -1,25 +1,20 @@
 Describe 'Main Script Execution' {
     BeforeAll {
-        Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop 3> $null
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null
-        Initialize-CtxAutodeployEnv
+        Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop 4> $null
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        Initialize-CtxAutodeployEnv 3> $null 4> $null
     }
 
     BeforeEach {
-        Set-Logging
-        Mock Get-BrokerDesktopGroup      { return Get-BrokerDesktopGroupMock }
-        Mock Get-BrokerCatalog           { return Get-BrokerCatalogMock }
-        Mock Get-BrokerMachine           { return Get-BrokerMachineMock }
+        Mock Get-BrokerDesktopGroup { return Get-BrokerDesktopGroupMock }
+        Mock Get-BrokerCatalog      { return Get-BrokerCatalogMock }
+        Mock Get-BrokerMachine      { return Get-BrokerMachineMock }
         Mock Initialize-CtxAutodeployEnv
 
         $Params = @{
             LogLevel = 'None'
             FilePath = "${PSScriptRoot}\test_config.json"
         }
-    }
-
-    AfterAll {
-
     }
 
     It 'Should initialize the environment' {
