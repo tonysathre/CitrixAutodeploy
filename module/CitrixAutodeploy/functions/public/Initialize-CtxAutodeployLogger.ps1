@@ -14,7 +14,10 @@ function Initialize-CtxAutodeployLogger {
         [string]$LogOutputTemplate = '[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}',
 
         [Parameter()]
-        [switch]$AddEnrichWithExceptionDetails
+        [switch]$AddEnrichWithExceptionDetails,
+
+        [Parameter()]
+        [switch]$IncludeConfig
     )
 
     Write-VerboseLog -Message "Function {MyCommand} called with parameters: {PSBoundParameters}" -PropertyValues $MyInvocation.MyCommand, ($PSBoundParameters | Out-String)
@@ -41,5 +44,9 @@ function Initialize-CtxAutodeployLogger {
         throw
     }
 
-    return $Logger, $LoggerConfig
+    if ($IncludeConfig) {
+        return $Logger, $LoggerConfig
+    }
+
+    return $Logger
 }
