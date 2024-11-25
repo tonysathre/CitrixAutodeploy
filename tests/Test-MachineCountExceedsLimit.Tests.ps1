@@ -7,7 +7,7 @@ Describe 'Test-MachineCountExceedsLimit' {
             "Citrix.MachineCreation.Commands"
         ) | Import-Module -Force -ErrorAction Stop 3> $null
 
-        $MockDesktopGroup = New-BrokerDesktopGroup
+        $MockDesktopGroup = New-BrokerDesktopGroupMock
 
         $MockCatalog = New-BrokerCatalogMock
     }
