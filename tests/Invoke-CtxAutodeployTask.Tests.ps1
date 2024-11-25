@@ -26,35 +26,40 @@ Describe 'Invoke-CtxAutodeployTask' {
 
     $TestCases = @(
         @{
-            FilePath     = 'PreTask'
+            FilePath     = "${PSScriptRoot}\test_PreTask.ps1"
             Type         = 'Pre'
-            ArgumentList = @()
+            Context      = 'PreTaskContext'
+            ArgumentList = @(@{
+                    Property1 = 'One'
+                    Property2 = 'Two'
+            })
         },
         @{
-            FilePath     = 'PostTask'
+            FilePath     = "${PSScriptRoot}\test_PostTask.ps1"
             Type         = 'Post'
-            ArgumentList = @()
+            Context      = 'PostTaskContext'
+            ArgumentList = @(@{
+                Property1 = 'One'
+                Property2 = 'Two'
+            })
         }
     )
 
-    It 'Should execute <_.FilePath>' -TestCases $TestCases {
-        param($FilePath, $Type, $ArgumentList)
+    It 'Should execute <_.Task>' -ForEach $TestCases {
+        param($FilePath, $Type, $Context, $ArgumentList)
 
         $ExpectedOutput = "A test ${Type} script was executed"
-        $FilePath       = "${PSScriptRoot}\test_${FilePath}.ps1"
-        Set-Content -Path $FilePath -Value "'${ExpectedOutput}'"
 
-        $Params = @{
-            FilePath     = $FilePath
-            Context      = 'PreTaskTest'
-            Type         = $Type
-            ArgumentList = $ArgumentList
-        }
-
-        $ActualOutput = Invoke-CtxAutodeployTask @Params
+        $ActualOutput = Invoke-CtxAutodeployTask @PSBoundParameters
         $ActualOutput | Should -Be $ExpectedOutput
 
         Remove-Item -Path $FilePath -Force
+    }
+
+    # TODO(tsathre): Come up with a better test name
+    It 'ArgumentList should contain stuff' -ForEach $TestCases {
+        param($FilePath, $Type, $ArgumentList)
+
     }
 
     # TODO(tsathre): Come up with a better test name
