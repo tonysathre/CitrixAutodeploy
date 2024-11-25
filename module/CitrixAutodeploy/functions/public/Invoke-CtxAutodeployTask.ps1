@@ -12,7 +12,7 @@ function Invoke-CtxAutodeployTask {
         [string]$Context,
 
         [Parameter(Mandatory)]
-        [Validateset('Pre', 'Post')]
+        [ValidateSet('Pre', 'Post')]
         [string]$Type
     )
 

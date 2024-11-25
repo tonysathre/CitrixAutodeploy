@@ -37,7 +37,7 @@ function Import-CitrixAutodeployModule {
 }
 
 function Remove-CitrixAutodeployModule {
-    "${PSScriptRoot}\..\module\CitrixAutodeploy" | Remove-Module -Force
+    Get-Module CitrixAutodeploy | Remove-Module -Force
 }
 
 function New-MockAdminAddress {
