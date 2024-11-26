@@ -205,7 +205,7 @@ function Get-AcctIdentityPoolMock {
         [bool]$Lock = $false
     )
 
-    return [PSCustomObject]@{
+    return New-MockObject -Type ([Citrix.ADIdentity.Sdk.IdentityPool]) -Properties @{
         IdentityPoolName = 'MockIdentityPool'
         Lock             = $Lock
     }
