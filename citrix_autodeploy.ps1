@@ -1,5 +1,6 @@
 ﻿#Requires -Modules PoShLog
 
+[CmdletBinding()]
 param (
     [Parameter()]
     [ValidateNotNullOrEmpty()]
@@ -7,8 +8,8 @@ param (
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
-    [ValidateSet('Verbose', 'Debug', 'Information', 'Warning', 'Error', 'Fatal')]
-    [string]$LogLevel = $env:CITRIX_AUTODEPLOY_LOGLEVEL,
+    [ValidateSet('Information', 'Debug', 'Warning', 'Error', 'Verbose', 'Fatal', 'None')]
+    [string]$LogLevel = $(if ($env:CITRIX_AUTODEPLOY_LOGLEVEL) { $env:CITRIX_AUTODEPLOY_LOGLEVEL } else { 'Information' }),
 
     [Parameter()]
     [ValidateNotNullOrEmpty()]
@@ -28,13 +29,11 @@ if ($DryRun) {
     $LogOutputTemplate = '[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}] [{Level:u3}] [DRYRUN] {Message:lj}{NewLine}{Exception}'
 }
 
-if (-not $LogLevel) {
-    $LogLevel = 'Information'
+Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop 3> $null 4> $null
+
+if ($LogLevel -ne 'None') {
+    $Logger = Initialize-CtxAutodeployLogger -LogLevel $LogLevel -LogFile $LogFile -LogOutputTemplate $LogOutputTemplate
 }
-
-Import-Module ${PSScriptRoot}\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -Scope Local -WarningAction SilentlyContinue 4> $null
-
-$Logger = Initialize-CtxAutodeployLogger -LogLevel $LogLevel -LogFile $LogFile -LogOutputTemplate $LogOutputTemplate
 
 Write-DebugLog -Message "Citrix Autodeploy started via {MyCommand} with parameters: {PSBoundParameters}" -PropertyValues $MyInvocation.MyCommand.Source, ($PSBoundParameters | Out-String)
 
@@ -203,7 +202,7 @@ foreach ($AutodeployMonitor in $Config.AutodeployMonitors.AutodeployMonitor) {
 
             # Stop Citrix Logger
             if ($Logging) {
-                Stop-CtxHighLevelLogger -AdminAddress $AdminAddress -Logging $Logging -IsSuccessful $JobSuccessful
+                Stop-CtxHighLevelLogger -AdminAddress $AdminAddress -HighLevelOperationId $Logging.Id -IsSuccessful $JobSuccessful
                 Remove-Variable -Name Logging
             }
 
@@ -217,5 +216,7 @@ if ($InternalLogger) {
     $InternalLogger | Close-Logger
 }
 
-Write-VerboseLog -Message 'Closing PoShLog logger'
-$Logger | Close-Logger
+if ($Logger) {
+    Write-VerboseLog -Message 'Closing PoShLog logger'
+    $Logger | Close-Logger
+}

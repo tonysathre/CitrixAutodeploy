@@ -1,48 +1,68 @@
+[CmdletBinding()]
+param ()
+
 Describe 'Invoke-CtxAutodeployTask' {
     BeforeAll {
-        Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Invoke-CtxAutodeployTask.ps1"
+        Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop 3> $null 4> $null
     }
 
-    $TestConfig = Get-CtxAutodeployConfig -FilePath ${PSScriptRoot}\test_config.json
+    AfterAll {
+        "${PSScriptRoot}\test_PreTask.ps1", "${PSScriptRoot}\test_PostTask.ps1" | Remove-Item -Force
+    }
+
     $TestCases = @(
         @{
-            Task = 'PreTask'
-            Type = 'Pre'
-            ArgumentList = @(
-                [PSCustomObject]@{
-                    AutodeployMonitor = $TestConfig.AutodeployMonitors.AutodeployMonitor[0]
-                    DesktopGroup      =  $TestConfig.AutodeployMonitors.AutodeployMonitor[0].DesktopGroupName
-                    BrokerCatalog     = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].BrokerCatalog
-                }
-            )
+            FilePath     = "${PSScriptRoot}\test_PreTask.ps1"
+            Type         = 'Pre'
+            Context      = 'PreTaskContext'
+            ArgumentList = @(@{
+                Property1 = 'One'
+            })
         },
         @{
-            Task = 'PostTask'
-            Type = 'Post'
-            ArgumentList = [PSCustomObject]@{
-                AutodeployMonitor = $TestConfig.AutodeployMonitors.AutodeployMonitor[0]
-                DesktopGroup      = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].DesktopGroupName
-                BrokerCatalog     = $TestConfig.AutodeployMonitors.AutodeployMonitor[0].BrokerCatalog
-            }
+            FilePath     = "${PSScriptRoot}\test_PostTask.ps1"
+            Type         = 'Post'
+            Context      = 'PostTaskContext'
+            ArgumentList = @(@{
+                Property1 = 'One'
+            })
         }
     )
 
-    It 'Should execute <_.Task>' -TestCases $TestCases {
-        param($Task, $Type, $ArgumentList)
+    It 'Should execute <_.Type> task script successfully' -ForEach $TestCases {
+        $ExpectedOutput = "A test ${Type} script was executed"
+        Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
 
-        $ExpectedOutput = "A test ${Task} script was executed"
-        $Task           = "${PSScriptRoot}\test_${Task}.ps1"
+        $ActualOutput = Invoke-CtxAutodeployTask @_
+        $ActualOutput | Should -Be $ExpectedOutput
+    }
 
-        $Params = @{
-            Task    = $Task
-            Context = 'TestContext'
-            Type    = $Type
-            ArgumentList = $ArgumentList
+    It 'ArgumentList properties should be accessible in <_.Type> task script' -ForEach $TestCases {
+        $ExpectedOutput = '{0}' -f $ArgumentList.Property1
+        Set-Content -Path $FilePath -Value "'$ExpectedOutput'"
+
+        $ActualOutput = Invoke-CtxAutodeployTask @_
+        $ActualOutput | Should -Be $ArgumentList.Property1
+    }
+
+    Context 'When an error occurs in a <_.Type> task script' -ForEach $TestCases {
+        It 'Should throw an exception' {
+            $InvalidCommand = 'Non-ExistentCmdlet'
+            Set-Content -Path $FilePath -Value $InvalidCommand
+
+            { Invoke-CtxAutodeployTask @_ } | Should -Throw -ErrorId CommandNotFoundException -ExpectedMessage "The term '${InvalidCommand}' is not recognized as the name of a cmdlet*"
         }
 
-        Set-Content -Path $Task -Value "'${ExpectedOutput}'"
+        It 'Should log an error' {
+            Mock Write-ErrorLog {}
 
-        $ActualOutput = Invoke-CtxAutodeployTask @Params
-        $ActualOutput | Should -Be $ExpectedOutput
+            $InvalidCommand = 'Non-ExistentCmdlet'
+            Set-Content -Path $FilePath -Value $InvalidCommand
+
+            { Invoke-CtxAutodeployTask @_ } | Should -Throw -ErrorId CommandNotFoundException -ExpectedMessage "The term '${InvalidCommand}' is not recognized as the name of a cmdlet*"
+
+            Should -Invoke Write-ErrorLog -Exactly 1 -Scope It
+        }
     }
 }

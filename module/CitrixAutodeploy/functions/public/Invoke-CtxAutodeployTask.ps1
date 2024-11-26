@@ -12,7 +12,7 @@ function Invoke-CtxAutodeployTask {
         [string]$Context,
 
         [Parameter(Mandatory)]
-        [Validateset('Pre', 'Post')]
+        [ValidateSet('Pre', 'Post')]
         [string]$Type
     )
 
@@ -21,7 +21,7 @@ function Invoke-CtxAutodeployTask {
     Write-InfoLog -Message "Executing {Type}-task script {FilePath} for {Context}" -PropertyValues $Type, $FilePath, $Context
 
     try {
-        $Output = & $FilePath
+        return & $FilePath
     }
     catch {
         Write-ErrorLog -Message "An error occurred while executing {Type}-task script {FilePath}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $Type, $FilePath

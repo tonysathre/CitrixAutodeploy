@@ -1,19 +1,10 @@
+[CmdletBinding()]
+param ()
+
 Describe 'Test-MachineCountExceedsLimit' {
     BeforeDiscovery {
-        @(
-            "Citrix.ADIdentity.Commands",
-            "Citrix.Broker.Commands",
-            "Citrix.ConfigurationLogging.Commands",
-            "Citrix.MachineCreation.Commands"
-        ) | Import-Module -Force -ErrorAction Stop 3> $null
-
-        $MockDesktopGroup = New-MockObject -Type ([Citrix.Broker.Admin.SDK.DesktopGroup]) -Properties @{
-            Name = 'MockDesktopGroup'
-        }
-
-        $MockCatalog = New-MockObject -Type ([Citrix.Broker.Admin.SDK.Catalog]) -Properties @{
-            Name = 'MockCatalog'
-        }
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        Import-CitrixPowerShellModules
     }
 
     BeforeAll {
@@ -21,48 +12,65 @@ Describe 'Test-MachineCountExceedsLimit' {
     }
 
     BeforeEach {
-        Mock Write-InfoLog    {}
-        Mock Write-DebugLog   {}
-        Mock Write-ErrorLog   {}
-        Mock Write-VerboseLog {}
-        Mock Write-WarningLog {}
-
+        $AdminAddress = New-MockAdminAddress
         Mock Get-BrokerMachine {
-        return @(1..5 | ForEach-Object {
-                            New-MockObject -Type ([Citrix.Broker.Admin.SDK.Machine]) -Properties @{
-                            Name = "Machine$_"
-                        }
-                    }
-                )
-            }
+            return @(1..5 | ForEach-Object { New-BrokerMachineMock })
         }
+    }
 
-    $Types = @($MockCatalog, $MockDesktopGroup)
+    $MockDesktopGroup = New-BrokerDesktopGroupMock
+    $MockCatalog      = New-BrokerCatalogMock
+    $Types            = @($MockCatalog, $MockDesktopGroup)
 
-    Context 'When InputObject is type <_.GetType().FullName>' -ForEach $Types {
-
+    Context 'When InputObject is type [<_.GetType().FullName>]' -ForEach $Types {
         It 'Should return $true if machine count exceeds MaxMachines' {
-            $Result = Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 3
+            $Result = Test-MachineCountExceedsLimit -AdminAddress $AdminAddress -InputObject $_ -MaxMachines 3
             $Result | Should -Be $true
         }
 
         It 'Should return $false if machine count is less than MaxMachines' {
-            $Result = Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $_ -MaxMachines 10
+            $Result = Test-MachineCountExceedsLimit -AdminAddress $AdminAddress -InputObject $_ -MaxMachines 10
             $Result | Should -Be $false
         }
-    }
 
-    Context 'Error Handling' {
-        It 'Should throw an error if Get-BrokerMachine fails' {
-            Mock Get-BrokerMachine {
-                throw 'Mocked exception'
+        Context 'Error handling' {
+            It 'Should throw a [ParameterBindingException] exception if InputObject is not a valid type' {
+                $Params = @{
+                    AdminAddress = $AdminAddress
+                    InputObject  = 'InvalidType'
+                    MaxMachines  = 3
+                }
+
+                { Test-MachineCountExceedsLimit @Params } | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException]) -ExpectedMessage "Cannot validate argument on parameter 'InputObject'*"
             }
 
-            { Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject $MockCatalog -MaxMachines 3 } | Should -Throw
-        }
+            It 'Should throw an exception if Get-BrokerMachine fails' {
+                $MockException = 'Mocked exception'
+                Mock Get-BrokerMachine { throw $MockException }
 
-        It 'Should throw an error if InputObject is not a valid type' {
-            { Test-MachineCountExceedsLimit -AdminAddress 'TestAdminAddress' -InputObject 'InvalidType' -MaxMachines 3 } | Should -Throw
+                $Params = @{
+                    AdminAddress = $AdminAddress
+                    InputObject  = $_
+                    MaxMachines  = 3
+                }
+
+                { Test-MachineCountExceedsLimit @Params } | Should -Throw -ExpectedMessage $MockException
+            }
+
+            It 'Should log the error' {
+                $Params = @{
+                    AdminAddress = $AdminAddress
+                    InputObject  = $_
+                    MaxMachines  = 3
+                }
+
+                $MockException = 'Mocked exception'
+                Mock Write-ErrorLog {}
+                Mock Get-BrokerMachine { throw $MockException }
+
+                { Test-MachineCountExceedsLimit @Params } | Should -Throw -ExpectedMessage $MockException
+                Should -Invoke Write-ErrorLog -Exactly 1 -Scope It
+            }
         }
     }
 }

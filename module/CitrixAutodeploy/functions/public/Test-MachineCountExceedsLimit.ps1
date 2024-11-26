@@ -6,7 +6,15 @@ function Test-MachineCountExceedsLimit {
         [string]$AdminAddress,
 
         [Parameter(Mandatory)]
-        [PSCustomObject]$InputObject,
+        [ValidateScript({
+            if ($_ -is [Citrix.Broker.Admin.SDK.Catalog] -or $_ -is [Citrix.Broker.Admin.SDK.DesktopGroup]) {
+                $true
+            } else {
+                Write-ErrorLog -Message "InputObject is invalid. Expected InputObject to be of type [Citrix.Broker.Admin.SDK.Catalog] or [Citrix.Broker.Admin.SDK.DesktopGroup]. Got {InputObject}" -PropertyValues $_.GetType().FullName
+                throw
+            }
+        })]
+        [psobject]$InputObject,
 
         [Parameter(Mandatory)]
         [int]$MaxMachines,
@@ -26,9 +34,6 @@ function Test-MachineCountExceedsLimit {
         $Params.Add('CatalogName', $InputObject.Name)
     } elseif ($InputObject -is [Citrix.Broker.Admin.SDK.DesktopGroup]) {
         $Params.Add('DesktopGroupName', $InputObject.Name)
-    } else {
-        Write-ErrorLog -Message "Input object is not a valid type. Expected InputObject to be of type [Citrix.Broker.Admin.SDK.Catalog] or [Citrix.Broker.Admin.SDK.DesktopGroup]. Got {InputObject}" -PropertyValues $InputObject.GetType().FullName
-        throw
     }
 
     try {
@@ -41,7 +46,7 @@ function Test-MachineCountExceedsLimit {
 
     if ($Machines.Count -ge $MaxMachines) {
         return $true
-    } else {
-        return $false
     }
+
+    return $false
 }

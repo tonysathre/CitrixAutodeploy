@@ -1,51 +1,107 @@
-# Describe "Wait-ForIdentityPoolUnlock" {
-#     BeforeAll {
-#         Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
-#     }
+[CmdletBinding()]
+param ()
 
-#     It "Should wait until the identity pool is unlocked within the timeout" {
-#         $IdentityPool = [PSCustomObject]@{ Lock = $true }
-
-#         Mock Start-Sleep { $IdentityPool.Lock = $false }
-
-#         { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 5 } | Should -Not -Throw
-#     }
-
-#     It "Should timeout if the identity pool remains locked" {
-#         $IdentityPool = [PSCustomObject]@{ Lock = $true }
-
-#         { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 5 } | Should -Throw
-#     }
-# }
-
-Describe "Wait-ForIdentityPoolUnlock" {
+Describe 'Wait-ForIdentityPoolUnlock' {
     BeforeAll {
-        Import-Module ${PSScriptRoot}\..\module\CitrixAutodeploy -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Wait-ForIdentityPoolUnlock.ps1"
     }
 
-    It "Should wait until the identity pool is unlocked within the timeout" {
-        $IdentityPool = [PSCustomObject]@{ Lock = $true }
-
-        Mock Start-Sleep { $IdentityPool.Lock = $false }
-
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Not -Throw
+    BeforeEach {
+        $global:InvocationCount = 1
     }
 
-    It "Should timeout if the identity pool remains locked" {
-        $IdentityPool = [PSCustomObject]@{ Lock = $true }
-
-        Mock Start-Sleep {}
-
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Throw
+    AfterEach {
+        Remove-Variable -Name InvocationCount -Scope Global
     }
 
-    It "Should not wait if the identity pool is not locked" {
-        $IdentityPool = [PSCustomObject]@{ Lock = $false }
+    Context 'When the identity pool is initially unlocked' {
+        It 'Should not wait and return immediately' {
+            Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $false }
 
-        Mock Start-Sleep {}
+            $Params = @{
+                AdminAddress = New-MockAdminAddress
+                IdentityPool = Get-AcctIdentityPoolMock -Lock $false
+                Timeout      = 60
+            }
 
-        { Wait-ForIdentityPoolUnlock -IdentityPool $IdentityPool -Timeout 2 } | Should -Not -Throw
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Not -Throw
+            Should -Not -Invoke Get-AcctIdentityPool -Scope It
+        }
+    }
 
-        Should -Invoke Start-Sleep -Exactly 0
+    Context 'When the identity pool unlocks within the timeout period' {
+        It 'Should wait until the pool is unlocked and then return' {
+            $Loops = 2
+            Mock Get-AcctIdentityPool {
+                if ($global:InvocationCount -eq $Loops) {
+                    return Get-AcctIdentityPoolMock -Lock $false
+                }
+                $global:InvocationCount++
+                return Get-AcctIdentityPoolMock -Lock $true
+            }
+
+            $Params = @{
+                AdminAddress = New-MockAdminAddress
+                IdentityPool = Get-AcctIdentityPoolMock -Lock $true
+                Timeout      = $Loops
+            }
+
+            $ExecutionTime = Measure-Command {
+                Wait-ForIdentityPoolUnlock @Params
+            }
+
+            $ExecutionTime.TotalSeconds | Should -BeGreaterThan $Loops
+            $ExecutionTime.TotalSeconds | Should -BeLessThan ($Loops + 1)
+            Should -Invoke Get-AcctIdentityPool -Exactly $Loops -Scope It
+        }
+    }
+
+    Context 'When the identity pool remains locked beyond the timeout period' {
+        It 'Should exit after the specified timeout period' {
+            Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $true }
+
+            $Params = @{
+                AdminAddress = New-MockAdminAddress
+                IdentityPool = Get-AcctIdentityPoolMock -Lock $true
+                Timeout      = 2
+            }
+
+            $ExecutionTime = Measure-Command {
+                Wait-ForIdentityPoolUnlock @Params
+            }
+
+            $ExecutionTime.TotalSeconds | Should -BeGreaterOrEqual 2
+            $ExecutionTime.TotalSeconds | Should -BeLessThan 3
+            Should -Invoke Get-AcctIdentityPool -Times 2 -Scope It
+        }
+
+        It 'Should log a warning' {
+            Mock Write-WarningLog {}
+            Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $true }
+
+            $Params = @{
+                AdminAddress = New-MockAdminAddress
+                IdentityPool = Get-AcctIdentityPoolMock -Lock $true
+                Timeout      = 1
+            }
+
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Not -Throw
+            Should -Invoke Write-WarningLog -Exactly 1 -Scope It
+        }
+    }
+
+    Context 'When an error occurs contacting delivery controller' {
+        It 'Should throw an exception' {
+            $Params = @{
+                AdminAddress = New-MockAdminAddress
+                IdentityPool = Get-AcctIdentityPoolMock -Lock $true
+                Timeout      = 1
+            }
+
+            $Exception = [System.Exception]
+            Mock Get-AcctIdentityPool { throw $Exception }
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Throw -ExceptionType ($Exception)
+        }
     }
 }

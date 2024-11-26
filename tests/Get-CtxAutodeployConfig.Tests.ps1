@@ -1,11 +1,15 @@
+[CmdletBinding()]
+param ()
+
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
-        Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop -DisableNameChecking -WarningAction SilentlyContinue
+        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Get-CtxAutodeployConfig.ps1"
     }
 
     Context 'When the configuration file exists' {
         It 'Should return a configuration object' {
-            $FilePath = "${PSScriptRoot}/test_config.json"
+            $FilePath = "${PSScriptRoot}\test_config.json"
             $Config = Get-CtxAutodeployConfig -FilePath $FilePath
             $Config | Should -Not -BeNullOrEmpty
             $Config.AutodeployMonitors.AutodeployMonitor[0].AdminAddress | Should -Be 'test-admin-address'
@@ -14,7 +18,7 @@ Describe 'Get-CtxAutodeployConfig' {
 
     Context 'When the configuration file does not exist' {
         It 'Should throw an error' {
-            $FilePath = "${PSScriptRoot}/non_existent_config.json"
+            $FilePath = "${PSScriptRoot}\non_existent_config.json"
             { Get-CtxAutodeployConfig -FilePath $FilePath } | Should -Throw
         }
     }
@@ -32,19 +36,19 @@ Describe 'Get-CtxAutodeployConfig' {
         }
     }
 }
-'@ | Set-Content -Path "${PSScriptRoot}/invalid_config.json"
-            $FilePath = "${PSScriptRoot}/invalid_config.json"
+'@ | Set-Content -Path "${PSScriptRoot}\invalid_config.json"
+            $FilePath = "${PSScriptRoot}\invalid_config.json"
             { Get-CtxAutodeployConfig -FilePath $FilePath } | Should -Throw
         }
 
         AfterAll {
-            Remove-Item "${PSScriptRoot}/invalid_config.json"
+            Remove-Item "${PSScriptRoot}\invalid_config.json"
         }
     }
 
     Context 'When no FilePath is provided and environment variable is set' {
         It 'Should use the environment variable for the file path' {
-            $env:CITRIX_AUTODEPLOY_CONFIG = "${PSScriptRoot}/test_config.json"
+            $env:CITRIX_AUTODEPLOY_CONFIG = "${PSScriptRoot}\test_config.json"
             $Config = Get-CtxAutodeployConfig
             $Config | Should -Not -BeNullOrEmpty
             $Config.AutodeployMonitors.AutodeployMonitor[0].AdminAddress | Should -Be 'test-admin-address'

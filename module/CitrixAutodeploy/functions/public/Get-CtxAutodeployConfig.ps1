@@ -13,7 +13,7 @@ function Get-CtxAutodeployConfig {
         $Config = Get-Content -Path $FilePath -Raw -ErrorAction Stop | ConvertFrom-Json
     }
     catch {
-        Write-ErrorLog -Message "Failed to load configuration from file {FilePath}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $FilePath
+        Write-FatalLog -Message "Failed to load configuration from file {FilePath}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $FilePath
         throw
     }
 
