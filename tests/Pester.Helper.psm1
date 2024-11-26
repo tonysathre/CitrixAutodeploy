@@ -7,7 +7,7 @@ function Import-CitrixPowerShellModules {
         'Citrix.Broker.Commands',
         'Citrix.ConfigurationLogging.Commands',
         'Citrix.MachineCreation.Commands'
-    ) | Import-Module -Force -ErrorAction Stop 3> $null
+    ) | Import-Module -Force -ErrorAction Stop 3> $null 4> $null
 }
 
 function Remove-CitrixPowerShellModules {
