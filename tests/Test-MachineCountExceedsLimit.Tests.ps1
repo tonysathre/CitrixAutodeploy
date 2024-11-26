@@ -4,8 +4,7 @@ param ()
 Describe 'Test-MachineCountExceedsLimit' {
     BeforeDiscovery {
         Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
-        $MockDesktopGroup = New-BrokerDesktopGroupMock
-        $MockCatalog      = New-BrokerCatalogMock
+        Import-CitrixPowerShellModules
     }
 
     BeforeAll {
@@ -13,15 +12,17 @@ Describe 'Test-MachineCountExceedsLimit' {
     }
 
     BeforeEach {
+        $AdminAddress = New-MockAdminAddress
         Mock Get-BrokerMachine {
             return @(1..5 | ForEach-Object { New-BrokerMachineMock })
         }
     }
 
-    $script:AdminAddress = New-MockAdminAddress
-    $Types = @($MockCatalog, $MockDesktopGroup)
+    $MockDesktopGroup = New-BrokerDesktopGroupMock
+    $MockCatalog      = New-BrokerCatalogMock
+    $Types            = @($MockCatalog, $MockDesktopGroup)
 
-    Context 'When InputObject is type <_.GetType().FullName>' -ForEach $Types {
+    Context 'When InputObject is type [<_.GetType().FullName>]' -ForEach $Types {
         It 'Should return $true if machine count exceeds MaxMachines' {
             $Result = Test-MachineCountExceedsLimit -AdminAddress $AdminAddress -InputObject $_ -MaxMachines 3
             $Result | Should -Be $true
@@ -33,7 +34,7 @@ Describe 'Test-MachineCountExceedsLimit' {
         }
 
         Context 'Error handling' {
-            It 'Should throw an exception if InputObject is not a valid type' {
+            It 'Should throw a [ParameterBindingException] exception if InputObject is not a valid type' {
                 $Params = @{
                     AdminAddress = $AdminAddress
                     InputObject  = 'InvalidType'
