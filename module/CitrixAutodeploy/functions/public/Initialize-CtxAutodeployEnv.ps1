@@ -13,7 +13,7 @@ function Initialize-CtxAutodeployEnv {
     Write-VerboseLog -Message "Function {MyCommand} called" -PropertyValues $MyInvocation.MyCommand
 
     try {
-        $Modules | Import-Module -Force -ErrorAction Stop 3> $null
+        $Modules | Import-Module -Force -ErrorAction Stop 3> $null 4> $null
     }
     catch {
         Write-FatalLog -Message "Failed to import module: {0}" -Exception $_.Exception -ErrorRecord $_ -PropertyValues $Modules

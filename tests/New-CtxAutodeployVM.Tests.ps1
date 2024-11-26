@@ -32,16 +32,16 @@ Describe 'New-CtxAutodeployVM' {
         }
     }
 
-    It 'should create a new Machine Creation Services machine successfully' {
+    It 'Should create a new Machine Creation Services machine successfully' {
         { New-CtxAutodeployVM @Params } | Should -Not -Throw
     }
 
-    It 'should return an object of type Citrix.Broker.Admin.SDK.Machine' {
+    It 'Should return an object of type Citrix.Broker.Admin.SDK.Machine' {
         $Result = New-CtxAutodeployVM @Params
         $Result[1] | Should -BeOfType Citrix.Broker.Admin.SDK.Machine # TODO(tsathre): Figure out why $Result is an array
     }
 
-    It 'should call the required Citrix cmdlets' {
+    It 'Should call the required Citrix cmdlets' {
         { New-CtxAutodeployVM @Params } | Should -Not -Throw
         Should -Invoke Get-ProvScheme       -Times 1
         Should -Invoke Get-AcctIdentityPool -Times 1
@@ -52,8 +52,8 @@ Describe 'New-CtxAutodeployVM' {
         Should -Invoke Add-BrokerMachine    -Times 1
     }
 
-    Context 'when identity pool is locked' {
-        It 'should call Wait-ForIdentityPoolUnlock at least one time' {
+    Context 'When identity pool is locked' {
+        It 'Should call Wait-ForIdentityPoolUnlock at least one time' {
             Mock Get-AcctIdentityPool       { return Get-AcctIdentityPoolMock -Lock $true }
             Mock Wait-ForIdentityPoolUnlock { return $null } -Module CitrixAutodeploy
 
@@ -63,23 +63,23 @@ Describe 'New-CtxAutodeployVM' {
         }
     } -Skip
 
-    Context 'when an error occurs' {
+    Context 'When an error occurs' {
         BeforeEach {
             Mock Write-ErrorLog {}
         }
 
-        It 'should log the error' {
+        It 'Should log the error' {
             Mock Get-ProvScheme { throw 'MockException' }
             { New-CtxAutodeployVM @Params } | Should -Throw
             Should -Invoke Write-ErrorLog -Times 1
         }
 
-        It 'should throw an exception' {
+        It 'Should throw an exception' {
             Mock Get-ProvScheme { throw 'MockException' }
             { New-CtxAutodeployVM @Params } | Should -Throw
         }
 
-        It 'should attempt to rollback changes' {
+        It 'Should attempt to rollback changes' {
             Mock Write-ErrorLog {}
             Mock New-ProvVM           { return Get-ProvTaskMock  }
             Mock Get-ProvTask         { return New-ProvTaskMock -Status Finished -TerminatingError 'MockTerminatingError' -Active $false  }
@@ -95,20 +95,9 @@ Describe 'New-CtxAutodeployVM' {
         } -Skip
     }
 
-    It 'should handle machine lock during rollback' {
-        Mock Get-ProvVM -MockWith {
-            return @{
-                VMName = 'TestVM'
-                Lock   = $true
-            }
-        }
-
-        Mock Get-ProvTask -MockWith {
-            return @{
-                Active           = $false
-                TerminatingError = 'TestError'
-            }
-        }
+    It 'Should handle machine lock during rollback' {
+        Mock Get-ProvVM -MockWith { return Get-ProvVMMock }
+        Mock Get-ProvTask { return New-ProvTaskMock -Active $false -TerminatingError 'MockError' }
 
         Mock Unlock-ProvVM
 
