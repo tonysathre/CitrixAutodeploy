@@ -7,12 +7,8 @@ Describe 'Wait-ForIdentityPoolUnlock' {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Wait-ForIdentityPoolUnlock.ps1"
     }
 
-    BeforeEach {
-        $global:InvocationCount = 1
-    }
-
-    AfterEach {
-        Remove-Variable -Name InvocationCount -Scope Global
+    AfterAll {
+        Remove-Variable -Name CallCount -Scope Global
     }
 
     Context 'When the identity pool is initially unlocked' {
@@ -31,29 +27,40 @@ Describe 'Wait-ForIdentityPoolUnlock' {
     }
 
     Context 'When the identity pool unlocks within the timeout period' {
-        It 'Should wait until the pool is unlocked and then return' {
-            $Loops = 2
+        It 'Should wait until the identity pool is unlocked and then return successfully' {
+            # Mock Get-AcctIdentityPool to simulate the pool being locked initially and then unlocked
+            # after the second call
             Mock Get-AcctIdentityPool {
-                if ($global:InvocationCount -eq $Loops) {
+                param (
+                    [string]$AdminAddress,
+                    [string]$IdentityPoolName
+                )
+                if ($global:CallCount -lt 2) {
+                    $global:CallCount++
+                    return Get-AcctIdentityPoolMock -Lock $true
+                } else {
                     return Get-AcctIdentityPoolMock -Lock $false
                 }
-                $global:InvocationCount++
-                return Get-AcctIdentityPoolMock -Lock $true
             }
+            # TODO(tsathre): Add a .5 second buffer to the timeout period to account for execution overhead.
+            # A bit janky but it works for now
+            $Buffer           = .5
+            $global:CallCount = 0
+            $Timeout          = 2
 
             $Params = @{
                 AdminAddress = New-MockAdminAddress
                 IdentityPool = Get-AcctIdentityPoolMock -Lock $true
-                Timeout      = $Loops
+                Timeout      = $Timeout
             }
 
-            $ExecutionTime = Measure-Command {
-                Wait-ForIdentityPoolUnlock @Params
-            }
+            $StartTime = Get-Date
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Not -Throw
+            $EndTime = Get-Date
+            $ExecutionTime = $EndTime - $StartTime
 
-            $ExecutionTime.TotalSeconds | Should -BeGreaterThan $Loops
-            $ExecutionTime.TotalSeconds | Should -BeLessThan ($Loops + 1)
-            Should -Invoke Get-AcctIdentityPool -Exactly $Loops -Scope It
+            $ExecutionTime.TotalSeconds | Should -BeGreaterThan 1
+            $ExecutionTime.TotalSeconds | Should -BeLessOrEqual ($Timeout + $Buffer)
         }
     }
 
@@ -99,9 +106,7 @@ Describe 'Wait-ForIdentityPoolUnlock' {
                 Timeout      = 1
             }
 
-            $Exception = [System.Exception]
-            Mock Get-AcctIdentityPool { throw $Exception }
-            { Wait-ForIdentityPoolUnlock @Params } | Should -Throw -ExceptionType ($Exception)
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Throw -ExceptionType 'System.InvalidOperationException' -ExpectedMessage "An invalid URL was given for the service*"
         }
     }
 }

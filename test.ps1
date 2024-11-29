@@ -22,7 +22,10 @@ param (
     $StackTraceVerbosity = 'Filtered',
 
     [Parameter()]
-    [bool]$CodeCoverageEnabled = $false
+    [bool]$CodeCoverageEnabled = $false,
+
+    [Parameter()]
+    [uint16]$Iterations = 1
 )
 
 try {
@@ -46,7 +49,9 @@ try {
     $PesterConfiguration.CodeCoverage.Path = $Tests
     $PesterConfiguration.CodeCoverage.CoveragePercentTarget = 75
 
-    Invoke-Pester -Configuration $PesterConfiguration
+    1..$Iterations | ForEach-Object {
+        Invoke-Pester -Configuration $PesterConfiguration
+    }
 }
 
 catch {}
