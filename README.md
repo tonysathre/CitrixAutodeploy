@@ -56,6 +56,8 @@ You will need to configure which machine catalogs and delivery groups you want t
                 "BrokerCatalog" : "Example Machine Catalog",
                 "DesktopGroupName" : "Example Delivery Group",
                 "MinAvailableMachines" : 1,
+                "MaxMachinesInDesktopGroup" : 0,
+                "MaxMachinesInBrokerCatalog" : 0,
                 "PreTask" : "",
                 "PostTask" : ""
             }
@@ -64,16 +66,20 @@ You will need to configure which machine catalogs and delivery groups you want t
 }
 ```
 
+> You can disable a job by setting `MinAvailableMachines` to `0`
+>
+> You can disable `MaxMachinesInDesktopGroup` and `MaxMachinesInBrokerCatalog` by not including them in the job definition, or by setting the value to `0`
+
 |Attribute|Description|
 |--- | ---|
-|AdminAddress         | Delivery controller FQDN
-|BrokerCatalog        | Machine catalog name
-|DesktopGroupName     | Delivery group name
-|MinAvailableMachines | How many machines you want to be available at all times
-|PreTask              | Script to run before creating a new machine
-|PostTask             | Script to run after creating a new machine
-
-MinAvailableMachines works by checking how many **unassigned** machines there are in the delivery group. It then subtracts that number from MinAvailableMachines to determine how many machines it must create to satisfy the configured MinAvailableMachines.
+|AdminAddress         | Delivery controller FQDN |
+|BrokerCatalog        | Machine catalog name |
+|DesktopGroupName     | Delivery group name |
+|MinAvailableMachines | How many machines you want to be available at all times |
+|MaxMachinesInBrokerCatalog | Limit the number of machines that can be added to the catalog |
+|MaxMachinesInDesktopGroup | Limit the number of machines that can be added to the desktop group |
+|PreTask              | Script to run before creating a new machine |
+|PostTask             | Script to run after creating a new machine |
 
 ### Adding custom properties
 
