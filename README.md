@@ -22,7 +22,7 @@ The Active Directory service account will need the 'Machine Catalog Administrato
 > I would not recommend running this directly on one of your delivery controllers. I run this on a management jump box.
 
 Start Powershell as Administrator then run the following commands:
-    
+
     git clone https://github.com/tonysathre/CitrixAutoDeploy.git
     cd CitrixAutoDeploy
     .\setup.ps1
@@ -56,6 +56,8 @@ You will need to configure which machine catalogs and delivery groups you want t
                 "BrokerCatalog" : "Example Machine Catalog",
                 "DesktopGroupName" : "Example Delivery Group",
                 "MinAvailableMachines" : 1,
+                "MaxMachinesInDesktopGroup" : 0,
+                "MaxMachinesInBrokerCatalog" : 0,
                 "PreTask" : "",
                 "PostTask" : ""
             }
@@ -64,16 +66,20 @@ You will need to configure which machine catalogs and delivery groups you want t
 }
 ```
 
+> You can disable a job by setting `MinAvailableMachines` to `0`
+>
+> You can disable `MaxMachinesInDesktopGroup` and `MaxMachinesInBrokerCatalog` by not including them in the job definition, or by setting the value to `0`
+
 |Attribute|Description|
 |--- | ---|
-|AdminAddress         | Delivery controller FQDN
-|BrokerCatalog        | Machine catalog name
-|DesktopGroupName     | Delivery group name
-|MinAvailableMachines | How many machines you want to be available at all times
-|PreTask              | Script to run before creating a new machine
-|PostTask             | Script to run after creating a new machine
-
-MinAvailableMachines works by checking how many **unassigned** machines there are in the delivery group. It then subtracts that number from MinAvailableMachines to determine how many machines it must create to satisfy the configured MinAvailableMachines.
+|AdminAddress         | Delivery controller FQDN |
+|BrokerCatalog        | Machine catalog name |
+|DesktopGroupName     | Delivery group name |
+|MinAvailableMachines | How many machines you want to be available at all times |
+|MaxMachinesInBrokerCatalog | Limit the number of machines that can be added to the catalog |
+|MaxMachinesInDesktopGroup | Limit the number of machines that can be added to the desktop group |
+|PreTask              | Script to run before creating a new machine |
+|PostTask             | Script to run after creating a new machine |
 
 ### Adding custom properties
 
@@ -96,7 +102,7 @@ Then in your post-task script, you can reference your custom property using the 
 ```powershell
 if (![string]::IsNullOrEmpty($AutoDeployMonitor.ADGroups)) {
     $ADObject = Get-AdComputer $NewBrokerMachine.MachineName.Split('\')[1]
-    
+
     foreach ($ADGroup in $AutoDeployMonitor.ADGroups) {
         Add-ADGroupMember -Identity $ADGroup -Members $ADObject
     }
@@ -136,7 +142,7 @@ $Fact2 = New-TeamsFact -Name 'Machine Catalog' -Value $MachineCatalog
 $Fact3 = New-TeamsFact -Name 'Delivery Group' -Value $DeliveryGroup
 
 $TeamsSection = @{
-    ActivityDetails = $Fact1, $Fact2, $Fact3   
+    ActivityDetails = $Fact1, $Fact2, $Fact3
 }
 
 $Sections = New-TeamsSection @TeamsSection
@@ -154,7 +160,7 @@ Send-TeamsMessage @TeamsMessage
 
 Here's an example MS Teams notification:
 
-![MS Teams](./teams.png)
+![MS Teams](./assets/teams.png)
 
 The two included monitor scripts will send alerts for event ID's 1 and 3 by default. You can get additional alerts by creating scheduled tasks that trigger on the different event ID's described below.
 
@@ -177,7 +183,7 @@ You can define a script to run in the [`citrix_autodeploy_config.json`](citrix_a
 Here is an example post-task that puts the newly created machine into maintenance mode, and then powers it on:
 
 ```powershell
-Set-BrokerMachineMaintenanceMode -AdminAddress $AdminAddress -InputObject $NewBrokerMachine -MaintenanceMode $true                   
+Set-BrokerMachineMaintenanceMode -AdminAddress $AdminAddress -InputObject $NewBrokerMachine -MaintenanceMode $true
 New-BrokerHostingPowerAction -AdminAddress $AdminAddress -MachineName $NewBrokerMachine.MachineName -Action TurnOn
 ```
 The following variables can be used in pre and post-task scripts:

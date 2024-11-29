@@ -1,0 +1,22 @@
+{
+    "AutodeployMonitors": {
+        "AutodeployMonitor": [
+            {
+                "AdminAddress": "test-admin-address",
+                "BrokerCatalog": "TestCatalog1",
+                "DesktopGroupName": "TestGroup1",
+                "MinAvailableMachines": 2,
+                "PreTask": ".\\tests\\test_pretask.ps1",
+                "PostTask": ".\\tests\\test_posttask.ps1"
+            },
+            {
+                "AdminAddress": "test-admin-address",
+                "BrokerCatalog": "TestCatalog2",
+                "DesktopGroupName": "TestGroup2",
+                "MinAvailableMachines": 2,
+                "PreTask": ".\\tests\\test_pretask.ps1",
+                "PostTask": ".\\tests\\test_posttask.ps1"
+            }
+        ]
+    }
+}
