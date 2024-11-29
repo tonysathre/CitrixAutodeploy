@@ -7,12 +7,8 @@ Describe 'Wait-ForIdentityPoolUnlock' {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Wait-ForIdentityPoolUnlock.ps1"
     }
 
-    BeforeEach {
-        $global:InvocationCount = 1
-    }
-
-    AfterEach {
-        Remove-Variable -Name InvocationCount -Scope Global
+    AfterAll {
+        Remove-Variable -Name CallCount -Scope Global
     }
 
     Context 'When the identity pool is initially unlocked' {
