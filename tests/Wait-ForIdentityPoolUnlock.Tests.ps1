@@ -106,9 +106,7 @@ Describe 'Wait-ForIdentityPoolUnlock' {
                 Timeout      = 1
             }
 
-            $Exception = [System.Exception]
-            Mock Get-AcctIdentityPool { throw $Exception }
-            { Wait-ForIdentityPoolUnlock @Params } | Should -Throw -ExceptionType ($Exception)
+            { Wait-ForIdentityPoolUnlock @Params } | Should -Throw -ExceptionType 'System.InvalidOperationException' -ExpectedMessage "An invalid URL was given for the service*"
         }
     }
 }
