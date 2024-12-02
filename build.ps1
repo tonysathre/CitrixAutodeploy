@@ -25,12 +25,16 @@ $ModuleManifest = @{
     Copyright         = $Copyright
     ProjectUri        = $ProjectUri
     ModuleVersion     = $ModuleVersion
-    Path              = "${BasePath}\CitrixAutodeploy.psd1"
+    RootModule        = $RootModule
+    Path              = $Path
     FunctionsToExport = $FunctionsToExport
     NestedModules     = $NestedModules
     RequiredModules   = $RequiredModules
-    ScriptsToProcess  = $ScriptsToProcess
+    #ScriptsToProcess  = $ScriptsToProcess
     VariablesToExport = $VariablesToExport
 }
 
 Update-PSModuleManifest @ModuleManifest
+
+# Trim trailing whitespace added by Update-PSModuleManifest
+(Get-Content $Path).Trim() | Set-Content $Path
