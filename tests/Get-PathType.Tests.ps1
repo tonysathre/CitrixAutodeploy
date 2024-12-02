@@ -1,4 +1,7 @@
-Describe 'Get-PathType Function' {
+[CmdletBinding()]
+param ()
+
+Describe 'Get-PathType' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\private\Get-PathType.ps1"
     }
@@ -27,13 +30,11 @@ Describe 'Get-PathType Function' {
 
     Context 'Valid Local File Paths' {
         BeforeAll {
-            # Create temporary files for testing
             New-Item -Path "$PSScriptRoot\TestFile1.txt" -ItemType File -Force | Out-Null
             New-Item -Path "$PSScriptRoot\TestFile2.json" -ItemType File -Force | Out-Null
         }
 
         AfterAll {
-            # Clean up temporary files
             Remove-Item -Path "$PSScriptRoot\TestFile1.txt", "$PSScriptRoot\TestFile2.json" -Force
         }
 
@@ -46,14 +47,14 @@ Describe 'Get-PathType Function' {
             $Result = Get-PathType -Path "$PSScriptRoot\TestFile2.json"
             $Result | Should -Be 'LocalFile'
         }
+
+        It "Should return 'LocalFile' for a non-existent file path" {
+            $Result = Get-PathType -Path "$PSScriptRoot\NonExistentFile.txt"
+            $Result | Should -Be 'LocalFile'
+        }
     }
 
     Context 'Invalid Paths' {
-        It "Should return 'Unknown' for a non-existent file path" {
-            $Result = Get-PathType -Path "$PSScriptRoot\NonExistentFile.txt"
-            $Result | Should -Be 'Unknown'
-        }
-
         It "Should return 'Unknown' for a random string" {
             $Result = Get-PathType -Path 'randomstring'
             $Result | Should -Be 'Unknown'
@@ -67,6 +68,10 @@ Describe 'Get-PathType Function' {
         It 'Should throw an [ParameterArgumentValidationError] exception for an empty string' {
             { Get-PathType -Path '' } | Should -Throw -ErrorId 'ParameterArgumentValidationError,Get-PathType' -ExceptionType ([System.Exception]) -ExpectedMessage "*The argument is null or empty*"
         }
+
+        It 'Should throw an exception for a file path with invalid characters' {
+            { Get-PathType -Path 'C:\Invalid|Path.txt' } | Should -Throw -ExpectedMessage "The provided file path contains invalid characters*"
+        }
     }
 
     Context 'Edge Cases' {
@@ -78,11 +83,6 @@ Describe 'Get-PathType Function' {
 
         It "Should return 'Unknown' for a directory path" {
             $Result = Get-PathType -Path "$PSScriptRoot"
-            $Result | Should -Be 'Unknown'
-        }
-
-        It "Should return 'Unknown' for a path with invalid characters" {
-            $Result = Get-PathType -Path 'C:\Invalid|Path.txt'
             $Result | Should -Be 'Unknown'
         }
     }

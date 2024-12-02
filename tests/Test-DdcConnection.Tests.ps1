@@ -14,7 +14,7 @@ Describe 'Test-DdcConnection' {
     }
 
     Context 'When connection fails' {
-        It 'Should return $false using protocol <_>' -ForEach $Protocols {
+        It "Should return $false using protocol <_>" -ForEach $Protocols {
             Mock Invoke-RestMethod { return $false }
 
             $Result = Test-DdcConnection -AdminAddress 'test-admin-address' -Protocol 'https'

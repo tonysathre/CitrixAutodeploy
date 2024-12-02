@@ -7,7 +7,7 @@ function Import-CitrixPowerShellModules {
         'Citrix.Broker.Commands',
         'Citrix.ConfigurationLogging.Commands',
         'Citrix.MachineCreation.Commands'
-    ) | Import-Module -Force -ErrorAction Stop 3> $null 4> $null
+    ) | Import-Module -Force -ErrorAction Stop
 }
 
 function Remove-CitrixPowerShellModules {
@@ -24,9 +24,13 @@ function Remove-CitrixPowerShellModules {
 
 function Import-CitrixAutodeployModule {
     [CmdletBinding()]
-    param ()
+    param (
+        [Parameter()]
+        [ValidateSet('Global', 'Local')]
+        [string]$Scope = 'Global'
+    )
 
-    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Force -ErrorAction Stop
+    Import-Module "${PSScriptRoot}\..\module\CitrixAutodeploy" -Scope $Scope -Force -ErrorAction Stop
 }
 
 function Remove-CitrixAutodeployModule {
