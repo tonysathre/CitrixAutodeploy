@@ -6,24 +6,19 @@ Describe 'Get-PathType' {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\private\Get-PathType.ps1"
     }
 
-    Context 'Valid HTTP/S URLs' {
-        It "Should return 'Uri' for an HTTP URL" {
-            $Result = Get-PathType -Path 'http://example.com'
+    Context 'Valid <_> URLs' -ForEach 'HTTP', 'HTTPS' {
+        It "Should return 'Uri' for an <_> URL" {
+            $Result = Get-PathType -Path ('{0}://example.com' -f $_)
             $Result | Should -Be 'Uri'
         }
 
-        It "Should return 'Uri' for an HTTPS URL" {
-            $Result = Get-PathType -Path 'https://example.com'
+        It "Should return 'Uri' for an <_> URL with query parameters" {
+            $Result = Get-PathType -Path ('{0}://example.com?param=value' -f $_)
             $Result | Should -Be 'Uri'
         }
 
-        It "Should return 'Uri' for an HTTPS URL with query parameters" {
-            $Result = Get-PathType -Path 'https://example.com?param=value'
-            $Result | Should -Be 'Uri'
-        }
-
-        It "Should return 'Uri' for an HTTPS URL with port number" {
-            $Result = Get-PathType -Path 'https://example.com:8080'
+        It "Should return 'Uri' for an <_> URL with port number" {
+            $Result = Get-PathType -Path ('{0}://example.com:8080' -f $_)
             $Result | Should -Be 'Uri'
         }
     }
@@ -54,6 +49,18 @@ Describe 'Get-PathType' {
         }
     }
 
+    Context 'Valid Directory Paths' {
+        It "Should return 'Directory' for a valid directory path" {
+            $Result = Get-PathType -Path "$PSScriptRoot"
+            $Result | Should -Be 'Directory'
+        }
+
+        It "Should return 'Directory' for another valid directory path" {
+            $Result = Get-PathType -Path "$env:TEMP"
+            $Result | Should -Be 'Directory'
+        }
+    }
+
     Context 'Invalid Paths' {
         It "Should return 'Unknown' for a random string" {
             $Result = Get-PathType -Path 'randomstring'
@@ -79,11 +86,6 @@ Describe 'Get-PathType' {
             $LongUrl = 'https://example.com?' + ('param=value&' * 100)
             $Result = Get-PathType -Path $LongUrl
             $Result | Should -Be 'Uri'
-        }
-
-        It "Should return 'Unknown' for a directory path" {
-            $Result = Get-PathType -Path "$PSScriptRoot"
-            $Result | Should -Be 'Unknown'
         }
     }
 }

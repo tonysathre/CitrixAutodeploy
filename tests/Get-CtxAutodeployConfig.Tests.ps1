@@ -33,19 +33,19 @@ Describe 'Get-CtxAutodeployConfig' {
         }
     }
 
-    Context 'Config File Set via $env:CITRIX_AUTODEPLOY_CONFIG' {
-        It 'Should return expected configuration object when a valid file path is set via environment variable' {
-            $env:CITRIX_AUTODEPLOY_CONFIG = $FilePath
-
-            $Result = Get-CtxAutodeployConfig
+    Context 'Valid Config File' {
+        It 'Should return expected configuration object when a valid file is provided' {
+            $Result = Get-CtxAutodeployConfig -Path $FilePath
             $Result | Should -BeOfType [PSCustomObject]
             $Result.AutodeployMonitors.AutodeployMonitor[0].AdminAddress | Should -Be 'test-admin-address'
         }
     }
 
-    Context 'Valid Config File' {
-        It 'Should return expected configuration object when a valid file is provided' {
-            $Result = Get-CtxAutodeployConfig -Path $FilePath
+    Context 'Config File Set via $env:CITRIX_AUTODEPLOY_CONFIG' {
+        It 'Should return expected configuration object when a valid file path is set via environment variable' {
+            $env:CITRIX_AUTODEPLOY_CONFIG = $FilePath
+
+            $Result = Get-CtxAutodeployConfig
             $Result | Should -BeOfType [PSCustomObject]
             $Result.AutodeployMonitors.AutodeployMonitor[0].AdminAddress | Should -Be 'test-admin-address'
         }
@@ -97,7 +97,7 @@ Describe 'Get-CtxAutodeployConfig' {
     }
 
     Context 'Empty Config File' {
-        It 'Should throw an error when the file is empty' {
+        It 'Should throw an error when the file is exists, but is empty' {
             Set-Content -Path $FilePath -Value $null
 
             { Get-CtxAutodeployConfig -Path $FilePath } | Should -Throw -ExpectedMessage 'The configuration file is empty*'
