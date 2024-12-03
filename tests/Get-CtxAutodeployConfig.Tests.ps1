@@ -28,7 +28,7 @@ Describe 'Get-CtxAutodeployConfig' {
     }
 
     AfterAll {
-        if (Test-Path -Path $FilePath) {
+        if (Test-Path -Path $script:FilePath) {
             Remove-Item -Path $FilePath -Force
         }
     }
