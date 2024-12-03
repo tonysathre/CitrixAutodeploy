@@ -37,4 +37,4 @@ $ModuleManifest = @{
 Update-PSModuleManifest @ModuleManifest
 
 # Trim trailing whitespace added by Update-PSModuleManifest
-(Get-Content $Path).Trim() | Set-Content $Path
+(Get-Content $Path).TrimEnd() | Set-Content $Path
