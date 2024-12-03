@@ -4,7 +4,6 @@ param ()
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
         Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop 3> $null 4> $null
-        Import-CitrixAutodeployModule
     }
 
     BeforeEach {
@@ -29,7 +28,7 @@ Describe 'Get-CtxAutodeployConfig' {
 
     AfterAll {
         if (Test-Path -Path $FilePath) {
-            Remove-Item -Path $FilePath -Force
+            Remove-Item -Path $FilePath -Force -ErrorAction SilentlyContinue
         }
     }
 
