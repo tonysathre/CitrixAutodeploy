@@ -31,22 +31,20 @@ param (
 try {
     if ($PSBoundParameters['Verbose']) {
         . ${PSScriptRoot}\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1 4> $null
-        $VerbosePreference -eq 'Continue'
         $Logger = Initialize-CtxAutodeployLogger -LogLevel Verbose -AddEnrichWithExceptionDetails
     }
 
     if ($PSBoundParameters['Debug']) {
         . ${PSScriptRoot}\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1 4> $null
-        $DebugPreference -eq 'Continue'
         $Logger = Initialize-CtxAutodeployLogger -LogLevel Debug -AddEnrichWithExceptionDetails
     }
 
     $PesterConfiguration = New-PesterConfiguration
-    $PesterConfiguration.Output.Verbosity = $Output
-    $PesterConfiguration.Run.Path = $Tests
-    $PesterConfiguration.Output.StackTraceVerbosity = $StackTraceVerbosity
-    $PesterConfiguration.CodeCoverage.Enabled = $CodeCoverageEnabled
-    $PesterConfiguration.CodeCoverage.Path = $Tests
+    $PesterConfiguration.Output.Verbosity                   = $Output
+    $PesterConfiguration.Run.Path                           = $Tests
+    $PesterConfiguration.Output.StackTraceVerbosity         = $StackTraceVerbosity
+    $PesterConfiguration.CodeCoverage.Enabled               = $CodeCoverageEnabled
+    $PesterConfiguration.CodeCoverage.Path                  = $Tests
     $PesterConfiguration.CodeCoverage.CoveragePercentTarget = 75
 
     1..$Iterations | ForEach-Object {
@@ -54,9 +52,13 @@ try {
     }
 }
 
-catch {}
+catch {
+    throw $_
+}
 
 finally {
     Close-Logger
-}
 
+    $global:VerbosePreference = 'SilentlyContinue'
+    $global:DebugPreference   = 'SilentlyContinue'
+}

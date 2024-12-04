@@ -4,8 +4,7 @@ param ()
 Describe 'Initialize-CtxAutodeployLogger' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1"
-        Import-Module ${PSScriptRoot}\Pester.Helper.psm1 -Force -ErrorAction Stop 3> $null 4> $null
-        Import-CitrixAutodeployModule 3> $null 4> $null
+        Import-CitrixAutodeployModule -Scope Global
     }
 
     AfterAll {
