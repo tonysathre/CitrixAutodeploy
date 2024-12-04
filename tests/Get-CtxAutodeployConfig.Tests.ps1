@@ -4,7 +4,8 @@ param ()
 Describe 'Get-CtxAutodeployConfig' {
     BeforeAll {
         Import-Module "${PSScriptRoot}\Pester.Helper.psm1" -Force -ErrorAction Stop 3> $null 4> $null
-        Import-CitrixAutodeployModule
+        Import-CitrixAutodeployModule -Scope Global
+        . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Get-CtxAutodeployConfig.ps1"
     }
 
     BeforeEach {
@@ -25,14 +26,6 @@ Describe 'Get-CtxAutodeployConfig' {
     }
 }
 '@ | Set-Content -Path $FilePath
-    }
-
-    AfterAll {
-        if (Test-Path -Path $script:FilePath) {
-            Remove-Item -Path $script:FilePath -Force -ErrorAction SilentlyContinue
-        }
-
-        Remove-CitrixAutodeployModule
     }
 
     Context 'Valid Config File' {
