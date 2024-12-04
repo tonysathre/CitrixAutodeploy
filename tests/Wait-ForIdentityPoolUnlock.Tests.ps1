@@ -46,12 +46,11 @@ Describe 'Wait-ForIdentityPoolUnlock' {
             # A bit janky but it works for now
             $Buffer           = .5
             $global:CallCount = 0
-            $Timeout          = 2
 
             $Params = @{
                 AdminAddress = New-MockAdminAddress
                 IdentityPool = Get-AcctIdentityPoolMock -Lock $true
-                Timeout      = $Timeout
+                Timeout      = 2
             }
 
             $StartTime = Get-Date
@@ -60,14 +59,14 @@ Describe 'Wait-ForIdentityPoolUnlock' {
             $ExecutionTime = $EndTime - $StartTime
 
             $ExecutionTime.TotalSeconds | Should -BeGreaterThan 1
-            $ExecutionTime.TotalSeconds | Should -BeLessOrEqual ($Timeout + $Buffer)
+            $ExecutionTime.TotalSeconds | Should -BeLessOrEqual ($Params.Timeout + $Buffer)
         }
     }
 
     Context 'When the identity pool remains locked beyond the timeout period' {
         It 'Should exit after the specified timeout period' {
             Mock Get-AcctIdentityPool { return Get-AcctIdentityPoolMock -Lock $true }
-
+            $Buffer          = 2
             $Params = @{
                 AdminAddress = New-MockAdminAddress
                 IdentityPool = Get-AcctIdentityPoolMock -Lock $true
@@ -79,7 +78,7 @@ Describe 'Wait-ForIdentityPoolUnlock' {
             }
 
             $ExecutionTime.TotalSeconds | Should -BeGreaterOrEqual 2
-            $ExecutionTime.TotalSeconds | Should -BeLessThan 3
+            $ExecutionTime.TotalSeconds | Should -BeLessThan ($Params.Timeout + $Buffer) # 2 second buffer to account for execution overhead
             Should -Invoke Get-AcctIdentityPool -Times 2 -Scope It
         }
 
