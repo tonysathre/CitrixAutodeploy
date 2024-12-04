@@ -4,6 +4,7 @@ param ()
 Describe 'Initialize-CtxAutodeployLogger' {
     BeforeAll {
         . "${PSScriptRoot}\..\module\CitrixAutodeploy\functions\public\Initialize-CtxAutodeployLogger.ps1"
+        Import-CitrixAutodeployModule -Scope Global
     }
 
     AfterAll {
